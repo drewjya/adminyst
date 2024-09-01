@@ -8,19 +8,12 @@ export default defineNuxtConfig({
   imports: {
     autoImport: true,
   },
-  modules: ["@nuxtjs/tailwindcss", "shadcn-nuxt", "@nuxt/image"],
-  shadcn: {
-    /**
-     * Prefix for all the imported component
-     */
-    prefix: "",
-    /**
-     * Directory that the component lives in.
-     * @default "./components/ui"
-     */
-
-    componentDir: "./components/ui",
+  colorMode: {
+    preference: "light",
+    fallback: "light",
   },
+  modules: ["@nuxt/image", "@nuxt/ui"],
+
   runtimeConfig: {
     public: {
       // baseUrl: "https://api.ystfamily.com/api",
