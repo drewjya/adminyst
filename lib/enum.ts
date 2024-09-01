@@ -1,0 +1,13 @@
+export enum OrderStatus {
+  PENDING = "PENDING",
+  CONFIRMED = "CONFIRMED",
+  RESCHEDULE = "RESCHEDULE",
+  ONGOING = "ONGOING",
+  COMPLETE = "COMPLETE",
+  CANCELLED = "CANCELLED",
+}
+
+export enum Gender {
+  MALE = "MALE",
+  FEMALE = "FEMALE",
+}
