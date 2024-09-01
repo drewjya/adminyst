@@ -1,7 +1,21 @@
 <script setup lang="ts">
 import { Menu, Package2 } from "lucide-vue-next";
+import SideBarSheet from "./SideBarSheet.vue";
 
 const sidebar = useSidebar();
+const sheet = useSlideover();
+
+const openSheet = () => {
+  sheet.open(SideBarSheet, {});
+};
+
+const route = useRoute();
+watch(
+  () => route.path,
+  () => {
+    sheet.close();
+  }
+);
 </script>
 
 <template>
@@ -13,10 +27,10 @@ const sidebar = useSidebar();
     >
       <NuxtLink
         href="/"
-        class="flex items-center gap-2 text-lg font-semibold md:text-base"
+        class="flex justify-start w-max items-center gap-2 text-lg font-semibold"
       >
         <Package2 class="h-6 w-6" />
-        <span class="sr-only">Acme Inc </span>
+        <p>YST Family</p>
       </NuxtLink>
       <NuxtLink
         v-for="i in sidebar.pages.value"
@@ -32,10 +46,9 @@ const sidebar = useSidebar();
       </NuxtLink>
     </nav>
 
-    <Button variant="outline" size="icon" class="shrink-0 lg:hidden">
+    <button class="shrink-0 lg:hidden" @click="openSheet">
       <Menu class="h-5 w-5" />
-      <span class="sr-only">Toggle navigation menu</span>
-    </Button>
+    </button>
 
     <div class="flex w-full items-center gap-4 md:ml-auto md:gap-2 lg:gap-4">
       <!-- <DropdownMenu>

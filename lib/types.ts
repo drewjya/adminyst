@@ -1,4 +1,4 @@
-import type { Gender, OrderStatus } from "@prisma/client";
+import type { Gender, OrderStatus } from "./enum";
 
 export type KeyFunction<T> = (data: T) => string;
 

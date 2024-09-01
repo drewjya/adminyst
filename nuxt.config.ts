@@ -12,7 +12,11 @@ export default defineNuxtConfig({
     preference: "light",
     fallback: "light",
   },
-  modules: ["@nuxt/image", "@nuxt/ui"],
+  modules: [
+    "@nuxt/image",
+    "@nuxt/ui",
+    ["@pinia/nuxt", { autoImports: ["defineStore", "defineStore"] }],
+  ],
 
   runtimeConfig: {
     public: {
