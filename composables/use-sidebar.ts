@@ -29,6 +29,10 @@ export const useSidebar = () => {
       link: "/analytic",
     },
     {
+      title: "Admins",
+      link: "/admin",
+    },
+    {
       title: "Customer",
       link: "/customer",
     },

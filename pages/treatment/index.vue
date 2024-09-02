@@ -124,7 +124,7 @@ watch(search, () => {
             placeholder="Search Tags"
             :loading="loadingTag"
             :searchable="searchTag"
-            option-attribute="nama"
+            option-attribute="name"
             by="id"
             v-model="selectedTags"
           />

@@ -64,14 +64,14 @@ export type VOrder = {
     nama: string;
     id: number;
   };
-  guestPhoneNumber: string,
+  guestPhoneNumber: string;
   picture: {
     path: string;
   } | null;
   therapist: {
     nama: string;
     no: string | null;
-    id: number,
+    id: number;
   } | null;
 };
 
@@ -106,18 +106,30 @@ export type State<T> = {
   loading: boolean;
 };
 
-
 export type VTags = {
-  id: number,
-  name: string
-}
+  id: number;
+  name: string;
+};
 
 export type VCategory = {
-  id: number,
-  nama:string
-}
+  id: number;
+  nama: string;
+};
 
 export type VBanner = {
   id: number;
   path: string;
-}
+};
+
+export type VAdmin = {
+  name: string;
+  email: string;
+  role: string;
+  adminCabang: {
+    id: number;
+    picture?: {
+      path: string;
+    };
+    nama: string;
+  };
+};
