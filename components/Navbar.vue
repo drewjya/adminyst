@@ -20,7 +20,7 @@ watch(
 
 <template>
   <header
-    class="sticky top-0 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6 z-50"
+    class="sticky top-0 flex h-16 items-center gap-4 border-b bg-white px-4 md:px-6 z-50"
   >
     <nav
       class="hidden flex-col gap-6 text-lg font-medium lg:flex lg:flex-row lg:items-center lg:text-sm lg:gap-6"

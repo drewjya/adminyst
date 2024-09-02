@@ -3,6 +3,11 @@ export default defineAppConfig({
     notifications: {
       position: "top-0 right-0",
     },
+    card: {
+      header: {
+        padding: "py-2",
+      },
+    },
     input: {
       color: {
         white: {

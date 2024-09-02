@@ -137,3 +137,30 @@ export function titleCase(val: string) {
     })
     .join(" ");
 }
+
+export type Profit = {
+  now: number;
+  prev: number;
+};
+export const percentageVal = (profit: Profit, val: "week" | "month") => {
+  if (profit.prev === 0) {
+    if (profit.now === 0) {
+      return `same from last ${val}`;
+    }
+    return `+${numberFormat(profit.now / 100)}% from last ${val}`;
+  }
+  if (profit.now !== profit.prev) {
+    const comparator = ((profit.now - profit.prev) / profit.prev) * 100;
+    console.log(comparator, val);
+
+    if (comparator === 0) {
+      return `same from last ${val}`;
+    }
+    return `${
+      comparator > 0
+        ? `+${numberFormat(comparator)}`
+        : `${numberFormat(comparator)}`
+    }% from last ${val}`;
+  }
+  return `same from the last ${val}`;
+};

@@ -31,7 +31,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
     :schema="schema"
     :state="state"
     @submit="onSubmit"
-    class="flex flex-col gap-4 max-w-[32rem] p-4 bg-white w-full"
+    class="flex flex-col gap-4 max-w-[20rem] md:max-w-[24rem] p-4 bg-white w-full rounded-lg"
   >
     <h3 class="text-2xl font-semibold text-center">Login</h3>
     <div class="flex flex-col gap-2">
@@ -59,13 +59,18 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
       </UFormGroup>
     </div>
 
-    <!-- <UButton label="Submit" type="submit" /> -->
-    <button
+    <UButton
+      label="Submit"
+      type="submit"
+      class="justify-center"
+      color="black"
+    />
+    <!-- <button
       class="p-0.5 text-md font-medium px-5 rounded-md bg-slate-300"
       type="submit"
     >
       Submit
-    </button>
+    </button> -->
   </UForm>
 </template>
 

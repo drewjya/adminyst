@@ -10,12 +10,13 @@ export default defineNuxtConfig({
   },
   colorMode: {
     preference: "light",
-    fallback: "light",
   },
+  css: ["~/assets/main.css"],
   modules: [
     "@nuxt/image",
     "@nuxt/ui",
     ["@pinia/nuxt", { autoImports: ["defineStore", "defineStore"] }],
+    "@nuxt/fonts",
   ],
 
   runtimeConfig: {

@@ -12,6 +12,12 @@ export const useApp = defineStore("global-app-store", () => {
   const user = ref<User>();
   const router = useRouter();
   const runtime = useRuntimeConfig();
+
+  const bearer = () => {
+    return {
+      Authorization:`Bearer ${accessToken.value??'invalid_token'}`
+    }
+  }
   const refresh = async () => {
     try {
       const res = await $fetch<SResponse<AuthRes>>("/auth/refresh", {
@@ -77,5 +83,6 @@ export const useApp = defineStore("global-app-store", () => {
   return {
     refresh,
     login,
+    bearer,
   };
 });
