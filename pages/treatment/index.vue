@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import EditDeleteButton from "~/assets/components/EditDeleteButton.vue";
+import EditDeleteButton from "~/components/EditDeleteButton.vue";
 import type { SResponse } from "~/lib/app";
 import type { VCategory, VTableColumn, VTags, VTreatment } from "~/lib/types";
 type Cur = number | undefined;
@@ -27,15 +27,41 @@ const { data, status } = await useApiFetch(
     },
   }
 );
-
-const { data: category, status: categoryStatus } = await useApiFetch<{
-  category: VCategory[];
-}>("/api/category");
-
-const { data: tags, status: tagStatus } = await useApiFetch<{
-  tags: VTags[];
-}>("/api/tags");
-
+const loadingCategory = ref(false);
+const runtime = useRuntimeConfig().public.baseUrl;
+async function searchCategory(query: string) {
+  loadingCategory.value = true;
+  try {
+    const res: SResponse<{
+      category: VCategory[];
+    }> = await $fetch(`/server/category?limit=6&query=${query}`, {
+      baseURL: runtime,
+      headers: app.bearer(),
+    });
+    loadingCategory.value = false;
+    return res.data?.category ?? <VCategory[]>[];
+  } catch (error) {
+    loadingCategory.value = false;
+    return <VCategory[]>[];
+  }
+}
+const loadingTag = ref(false);
+async function searchTag(query: string) {
+  loadingTag.value = true;
+  try {
+    const res: SResponse<{
+      tags: VTags[];
+    }> = await $fetch(`/server/tags?limit=6&query=${query}`, {
+      baseURL: runtime,
+      headers: app.bearer(),
+    });
+    loadingTag.value = false;
+    return res.data?.tags ?? <VTags[]>[];
+  } catch (error) {
+    loadingTag.value = false;
+    return <VTags[]>[];
+  }
+}
 const columns: VTableColumn<VTreatment>[] = [
   {
     class: "min-w-40",
@@ -71,27 +97,39 @@ watch(search, () => {
   <div
     class="flex flex-col gap-2 w-[calc(100svw-2rem)] md:w-[calc(100svw-4rem)]"
   >
-    <div class="flex gap-2">
-      <ULink
-        variant="outline"
-        size="xs"
-        class="text-label_sm border px-2 rounded border-black font-semibold"
-        >Add New Treatment</ULink
-      >
-      <VDropdown
-        :items="category?.category"
-        :loading="categoryStatus === 'pending'"
-        :display="(v) => v.nama"
-        label="Category"
-        v-model="selectedCategory"
-      />
-      <VDropdown
-        :items="tags?.tags"
-        :loading="tagStatus === 'pending'"
-        :display="(v) => v.name"
-        label="Tags"
-        v-model="selectedTags"
-      />
+    <div class="flex gap-2 items-end">
+      <div>
+        <ULink
+          variant="outline"
+          size="xs"
+          class="text-label_sm border p-2 rounded border-black font-semibold"
+          >Add New Treatment</ULink
+        >
+      </div>
+      <div class="max-w-[30rem]">
+        <UFormGroup label="Category">
+          <USelectMenu
+            placeholder="Search Category"
+            :loading="loadingCategory"
+            :searchable="searchCategory"
+            option-attribute="nama"
+            by="id"
+            v-model="selectedCategory"
+          />
+        </UFormGroup>
+      </div>
+      <div class="max-w-[30rem]">
+        <UFormGroup label="Tags">
+          <USelectMenu
+            placeholder="Search Tags"
+            :loading="loadingTag"
+            :searchable="searchTag"
+            option-attribute="nama"
+            by="id"
+            v-model="selectedTags"
+          />
+        </UFormGroup>
+      </div>
     </div>
     <VTable
       @reset="

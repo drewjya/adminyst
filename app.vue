@@ -4,6 +4,6 @@
   <NuxtLayout>
     <NuxtPage> </NuxtPage>
   </NuxtLayout>
-  <UNotifications class="max-h-24" />
+  <UNotifications />
   <USlideovers />
 </template>

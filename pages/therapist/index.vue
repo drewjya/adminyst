@@ -1,7 +1,5 @@
 <script setup lang="ts">
-
-
-
+import { watchIgnorable } from "@vueuse/core";
 import type { SResponse } from "~/lib/app";
 import type { Gender } from "~/lib/enum";
 import type { VCabang, VTableColumn, VTherapist } from "~/lib/types";
@@ -13,28 +11,76 @@ const searchName = ref("");
 const gender = ref<Gender | undefined>();
 const searchNo = ref("");
 const searchCabang = ref<VCabang | undefined>();
+const loading = ref(false);
+const selectedCabang = ref<VCabang>();
 type TherapistReq = SResponse<{
   therapist: VTherapist[];
   nextCursor: number | null;
 }>;
-const app = useApp()
-const { data, status } = await useApiFetch(
-  () =>
-    `/server/therapist?query=${searchName.value}&gender=${gender.value ?? ""}&no=${
-      searchNo.value
-    }&cabang=${searchCabang.value?.id ?? ""}&${skip.value ?? ""}`,
-    {
-    headers: app.bearer(),
-    transform: (val: TherapistReq) => {
-      return val.data;
-    },
-  }
+const app = useApp();
 
+const route = useRoute();
+const router = useRouter();
+const ignore = watchIgnorable(
+  [skip, gender, searchName, searchNo, selectedCabang],
+  () => {
+    router.replace({
+      query: {
+        ...route.query,
+        query: `${searchName.value}`,
+        gender: `${gender.value ?? ""}`,
+        no: `${searchNo.value}`,
+        cabang: `${selectedCabang.value?.id ?? ""}`,
+        cursor: `${skip.value}`,
+      },
+    });
+  }
 );
 
-const { data: cabang, status: cabangStatus } = await useLazyFetch<{
-  cabang: VCabang[];
-}>("/api/cabang");
+onMounted(() => {
+  ignore.ignoreUpdates(() => {
+    skip.value = `${route.query.skip ?? ""}`;
+    gender.value = route.query.gender
+      ? (route.query.gender as Gender)
+      : undefined;
+    searchName.value = `${route.query.query ?? ""}`;
+    searchNo.value = `${route.query.no ?? ""}`;
+    // searchCabang.value = `${route.query.skip ??''}`
+  });
+});
+
+const url = computed(() => {
+  return `/server/therapist?query=${route.query.query ?? ""}&gender=${
+    route.query.gender ?? ""
+  }&no=${route.query.no ?? ""}&cabang=${route.query.cabang ?? ""}&cursor=${
+    route.query.cursor ?? ""
+  }`;
+});
+
+const { data, status } = await useApiFetch(() => url.value, {
+  headers: app.bearer(),
+  transform: (val: TherapistReq) => {
+    return val.data;
+  },
+});
+
+const runtime = useRuntimeConfig().public.baseUrl;
+async function search(query: string) {
+  loading.value = true;
+  try {
+    const res: SResponse<{
+      cabang: VCabang[];
+      nextCursor: number | null;
+    }> = await $fetch(`/server/cabang?limit=6&query=${query}`, {
+      baseURL: runtime,
+      headers: app.bearer(),
+    });
+    loading.value = false;
+    return res.data?.cabang ?? <VCabang[]>[];
+  } catch (error) {
+    return <VCabang[]>[];
+  }
+}
 
 const columns: VTableColumn<VTherapist>[] = [
   {
@@ -62,64 +108,22 @@ const columns: VTableColumn<VTherapist>[] = [
     label: "Cabang",
   },
 ];
-
-watch(searchName, () => {
-  if (!skip) {
-    return;
-  }
-
-  skip.value = "";
-  cursors.value = [undefined];
-});
-
-watch(searchNo, () => {
-  if (!skip) {
-    return;
-  }
-
-  skip.value = "";
-  cursors.value = [undefined];
-});
-
-watch(searchCabang, () => {
-  if (!skip) {
-    return;
-  }
-
-  skip.value = "";
-  cursors.value = [undefined];
-});
-
-watch(gender, () => {
-  if (!skip) {
-    return;
-  }
-
-  skip.value = "";
-  cursors.value = [undefined];
-});
 </script>
 
 <template>
   <div
     class="flex flex-col gap-2 w-[calc(100svw-2rem)] md:w-[calc(100svw-4rem)]"
   >
-    <div class="flex items-center justify-between">
-      <AppBreadCrumb />
-
-      <Button variant="outline" size="sm">Add New Therapist</Button>
+    <div class="flex items-center justify-end">
+      <ULink
+        variant="outline"
+        size="xs"
+        class="text-label_sm border px-2 py-1.5 rounded border-black font-semibold"
+        >Add New Therapist</ULink
+      >
     </div>
 
-    <div class="flex gap-3 items-center">
-      <Input v-model="searchNo" placeholder="Search No" />
-      <VDropdown
-        :items="cabang?.cabang"
-        :loading="cabangStatus === 'pending'"
-        :display="(v) => v.nama"
-        :show-label="false"
-        label="Cabang"
-        v-model="searchCabang"
-      />
+    <div>
       <VDropdown
         :show-label="false"
         :items="genderList()"
@@ -128,16 +132,36 @@ watch(gender, () => {
         :display="(v) => titleCase(v)"
       ></VDropdown>
     </div>
-    <VTable
 
-      placeholder="Search Name"
+    <div class="max-w-[30rem]">
+      <UFormGroup label="Cabang">
+        <USelectMenu
+          placeholder="Search Cabang"
+          :loading
+          :searchable="search"
+          option-attribute="nama"
+          by="id"
+          v-model="selectedCabang"
+        />
+      </UFormGroup>
+    </div>
+    <UFormGroup label="Search No">
+      <UInput
+        v-model="searchNo"
+        placeholder="Search No"
+        class="w-full max-w-[30rem]"
+      />
+    </UFormGroup>
+
+    <VTable
+      placeholder="Belum Ada Terapis"
       @reset="
         () => {
           searchName = '';
           skip = '';
           gender = undefined;
           searchNo = '';
-          searchCabang = undefined;
+          selectedCabang = undefined;
           cursors = [undefined];
         }
       "
@@ -167,6 +191,7 @@ watch(gender, () => {
           skip = next;
         }
       "
+      :extra="3"
       :loading="status === 'pending'"
       :column="columns"
       :data="data?.therapist ?? undefined"
@@ -180,54 +205,41 @@ watch(gender, () => {
       </template>
 
       <template #default="{ data }">
-        <TableCell>
-          <div class="flex justify-center">
-            <Button
-              v-if="!data.attendance?.checkIn"
-              size="sm"
-              variant="outline"
-            >
-              Check In
-            </Button>
-            <p v-else>
-              {{ data.attendance?.checkIn?.toString() }}
-            </p>
+        <div class="flex justify-center items-center">
+          <UButton
+            v-if="!data.attendance?.checkIn"
+            size="xs"
+            color="black"
+            class="text-black"
+            variant="outline"
+            label="Check In"
+          />
+
+          <p v-else>
+            {{ data.attendance?.checkIn?.toString() }}
+          </p>
+        </div>
+
+        <div class="flex justify-center">
+          <div v-if="!data.attendance?.checkIn" size="sm" variant="secondary">
+            -
           </div>
-        </TableCell>
-        <TableCell>
-          <div class="flex justify-center">
-            <div v-if="!data.attendance?.checkIn" size="sm" variant="secondary">
-              -
-            </div>
-            <Button
-              v-else-if="!data.attendance?.checkOut"
-              size="sm"
-              variant="outline"
-            >
-              Check Out
-            </Button>
-            <p v-else>
-              {{ data.attendance?.checkOut?.toString() }}
-            </p>
-          </div>
-        </TableCell>
-        <TableCell>
-          <DropdownMenu>
-            <DropdownMenuTrigger as-child>
-              <Button
-                variant="ghost"
-                class="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
-              >
-                <DotsHorizontalIcon class="h-4 w-4" />
-                <span class="sr-only">Open menu</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" class="w-[160px]">
-              <DropdownMenuItem>Edit</DropdownMenuItem>
-              <DropdownMenuItem> Delete </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </TableCell>
+          <UButton
+            v-else-if="!data.attendance?.checkOut"
+            label="Check Out"
+            size="xs"
+            color="black"
+            class="text-black"
+            variant="outline"
+          />
+          <p v-else>
+            {{ data.attendance?.checkOut?.toString() }}
+          </p>
+        </div>
+
+        <div>
+          <EditDeleteButton :edit="() => {}" :remove="() => {}" />
+        </div>
       </template>
     </VTable>
   </div>

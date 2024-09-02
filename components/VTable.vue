@@ -34,7 +34,7 @@ withDefaults(
     <UInput
       placeholder="Search"
       v-model="search"
-      class="w-full max-w-[20rem]"
+      class="w-full max-w-[30rem]"
     />
     <UButton @click="emit('reset')" color="black" variant="outline" size="xs"
       >Reset</UButton
@@ -44,7 +44,9 @@ withDefaults(
   <div
     class="grid grid-cols-3"
     :style="{
-      gridTemplateColumns: `repeat(${column.length + extra}, auto)`,
+      gridTemplateColumns: `repeat(${
+        column.length + (!loading && data.length !== 0 ? extra : 0)
+      }, auto)`,
     }"
   >
     <div
