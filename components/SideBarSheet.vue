@@ -6,7 +6,7 @@ const sidebar = useSidebar();
   <USlideover side="left">
     <div class="p-4 flex-1">
       <nav class="grid gap-1 text-sm font-medium">
-        <p class="text-lg">YST Family</p>
+        <p class="text-lg font-bold">YST Family</p>
 
         <NuxtLink
           v-for="i in sidebar.pages.value"

@@ -29,18 +29,7 @@ type OrderReq = SResponse<{
   order: VOrder[];
   nextCursor: number | null;
 }>;
-// const url = computed(
-//   () =>
-//     `/server/order?start=${
-//       date.value.start ? formatDate(date.value.start!) : ""
-//     }&end=${date.value.end ? formatDate(date.value.end!) : ""}&status=${
-//       orderStatus.value
-//     }&therapist=${therapist.value}&name=${user.value}&email=${
-//       email.value
-//     }&phone=${phone.value}&gender=${gender.value ?? ""}&cursor=${
-//       skip.value
-//     }&no=${kodeNomor.value}`
-// );
+
 const route = useRoute();
 const router = useRouter();
 const url = computed(
@@ -76,7 +65,7 @@ const { status, data, error } = await useApiFetch(() => url.value, {
 const { data: income } = await useApiFetch(
   () =>
     `/server/order/income?date=${todayString()}&status=${
-      orderStatus.value
+      route.query.status ?? ""
     }&cabangId=`,
   {
     headers: app.bearer(),
@@ -173,9 +162,6 @@ onMounted(() => {
   <div
     class="flex flex-col gap-4 w-[calc(100svw-2rem)] md:w-[calc(100svw-4rem)]"
   >
-    <div class="flex items-center justify-between">
-      <AppBreadCrumb />
-    </div>
     <main
       class="grid flex-1 items-start gap-4 sm:py-0 md:gap-8 lg:grid-cols-3 xl:grid-cols-3"
     >

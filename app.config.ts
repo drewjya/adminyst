@@ -7,6 +7,12 @@ export default defineAppConfig({
       header: {
         padding: "py-2",
       },
+      body: {
+        padding: "!py-2",
+      },
+      footer: {
+        padding: "py-2",
+      },
     },
     input: {
       color: {

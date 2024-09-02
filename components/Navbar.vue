@@ -70,3 +70,9 @@ watch(
     </div>
   </header>
 </template>
+
+<style scoped>
+.box {
+  resize: both;
+}
+</style>
