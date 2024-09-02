@@ -32,6 +32,7 @@ watch(data, (val) => {
 </script>
 
 <template>
+  <ULink class="p-2 rounded ring-1 text-black">Add New Admin</ULink>
   <div
     v-if="status === 'pending'"
     class="flex justify-center items-center h-20"
@@ -44,7 +45,7 @@ watch(data, (val) => {
   >
     <p>Belum Ada Admin</p>
   </div>
-  <div v-else class="grid md:grid-cols-2 gap-2">
+  <div v-else class="grid md:grid-cols-2 gap-3 p-4">
     <UCard v-for="(i, index) in data" class="text-label font-medium">
       <template #header>
         <div class="text-label_lg font-semibold">
