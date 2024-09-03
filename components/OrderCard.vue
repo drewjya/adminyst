@@ -12,18 +12,20 @@ const { state } = defineProps<{
   state: State<VOrderDetail>;
 }>();
 
+const therapist = defineModel<number>();
+
 // const value = ref<OrderStatus | undefined>()
 
 const emit = defineEmits<{
   // <eventName>: <expected arguments>
   select: [value: OrderStatus]; // named tuple syntax
 }>();
-// watch(value, (val) => {
-//   if (val) {
 
-//     emit('update', val)
-//   }
-// })
+watchEffect(() => {
+  if (state.data) {
+    therapist.value = state.data.therapist?.id;
+  }
+});
 </script>
 
 <template>
