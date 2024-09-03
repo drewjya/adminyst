@@ -122,6 +122,7 @@ export type VBanner = {
 };
 
 export type VAdmin = {
+  id: number;
   name: string;
   email: string;
   role: string;

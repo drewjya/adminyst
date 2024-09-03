@@ -3,7 +3,7 @@ import type { SResponse } from "~/lib/app";
 import type { VAdmin } from "~/lib/types";
 
 const app = useApp();
-const { data, status } = useApiFetch("/server/admin", {
+const { data, status, refresh } = useApiFetch("/server/admin", {
   headers: app.bearer(),
   transform: (
     data: SResponse<{
@@ -12,27 +12,103 @@ const { data, status } = useApiFetch("/server/admin", {
   ) => data.data?.admins ?? [],
 });
 
+const loading = ref(false);
+const notif = useNotif();
 const runtime = useRuntimeConfig();
-
-const emails = ref<string[]>([]);
-const passwords = ref<string[]>([]);
-
-watch(data, (val) => {
-  if (val) {
-    const datas = val.map((e) => {
-      return e.email;
+const editForm = async (
+  email: string,
+  password: string,
+  id: number,
+  cabangId: number
+) => {
+  loading.value = true;
+  try {
+    const res = await $fetch<SResponse<any>>("/server/admin", {
+      baseURL: runtime.public.baseUrl,
+      method: "put",
+      headers: app.bearer(),
+      body: {
+        adminId: id,
+        cabangId: cabangId,
+        email: email,
+        password: password,
+      },
     });
-    emails.value = datas;
-    passwords.value = datas.map((e) => "");
-  } else {
-    emails.value = [];
-    passwords.value = [];
+    if (res.data) {
+      notif.success({
+        title: "Success edit admin",
+      });
+    } else {
+      notif.error({
+        title: "Something Wrong",
+        description: res.message,
+      });
+    }
+    loading.value = false;
+
+    refresh();
+  } catch (error: any) {
+    if (error.data) {
+      const data: SResponse<any> = error.data;
+      notif.error({
+        title: "Something Wrong",
+        description: data.message,
+      });
+    } else {
+      notif.error({
+        title: "Something Wrong",
+        description: "Try again later",
+      });
+    }
+    loading.value = false;
   }
-});
+};
+const deleteForm = async (id: number, cabangId: number) => {
+  loading.value = true;
+  try {
+    const res = await $fetch<SResponse<any>>(`/server/admin/${id}`, {
+      baseURL: runtime.public.baseUrl,
+      method: "DELETE",
+      headers: app.bearer(),
+      body: {
+        cabangId: cabangId,
+      },
+    });
+    if (res.data) {
+      notif.success({
+        title: "Success delete admin",
+      });
+    } else {
+      notif.error({
+        title: "Something Wrong",
+        description: res.message,
+      });
+    }
+    loading.value = false;
+
+    refresh();
+  } catch (error: any) {
+    if (error.data) {
+      const data: SResponse<any> = error.data;
+      notif.error({
+        title: "Something Wrong",
+        description: data.message,
+      });
+    } else {
+      notif.error({
+        title: "Something Wrong",
+        description: "Try again later",
+      });
+    }
+    loading.value = false;
+  }
+};
 </script>
 
 <template>
-  <ULink class="p-2 rounded ring-1 text-black">Add New Admin</ULink>
+  <ULink class="p-2 rounded ring-1 text-black text-center" to="/admin/add"
+    >Add New Admin</ULink
+  >
   <div
     v-if="status === 'pending'"
     class="flex justify-center items-center h-20"
@@ -45,32 +121,15 @@ watch(data, (val) => {
   >
     <p>Belum Ada Admin</p>
   </div>
-  <div v-else class="grid md:grid-cols-2 gap-3 p-4">
-    <UCard v-for="(i, index) in data" class="text-label font-medium">
-      <template #header>
-        <div class="text-label_lg font-semibold">
-          {{ i.adminCabang.nama }}
-        </div>
-      </template>
-      <div class="flex flex-col gap-1">
-        <div class="flex items-center justify-center bg-slate-200/20">
-          <NuxtImg
-            v-if="i.adminCabang.picture"
-            :src="runtime.public.imageUrl + i.adminCabang.picture.path"
-            class="w-52"
-          />
-        </div>
-        <div class="capitalize text-lg font-semibold">
-          {{ i.role.toLowerCase() }}
-        </div>
-        <UFormGroup label="Email">
-          <UInput v-model="emails[index]" />
-        </UFormGroup>
-        <UFormGroup label="Password">
-          <UInput v-model="passwords[index]" />
-        </UFormGroup>
-      </div>
-    </UCard>
+  <div v-else class="grid md:grid-cols-2 gap-3">
+    <AdminCard
+      v-for="i in data"
+      :admin="i"
+      @remove="() => deleteForm(i.id, i.adminCabang.id)"
+      @edit="
+        (email, password) => editForm(email, password, i.id, i.adminCabang.id)
+      "
+    />
   </div>
 </template>
 
