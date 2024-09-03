@@ -30,10 +30,7 @@ export type VTreatment = {
     nama: string;
     id: number;
   };
-  tags: {
-    name: string;
-    id: number;
-  } | null;
+  tags: VTags| null;
 };
 
 export type VTherapist = {

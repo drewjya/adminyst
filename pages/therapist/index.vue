@@ -284,7 +284,7 @@ const deleteForm = async (id: number) => {
               () => {
                 console.log(data);
 
-                $router.push(`/therapist/${data.id}`);
+                $router.push(`/therapist/${data.id}/edit`);
               }
             "
             :remove="() => deleteForm(data.id)"

@@ -14,7 +14,7 @@ const selectedTags = ref<VTags | undefined>();
 
 const selectedCategory = ref<VCategory | undefined>();
 const app = useApp();
-const { data, status } = await useApiFetch(
+const { data, status, refresh } = await useApiFetch(
   () =>
     `/server/treatment?query=${search.value}&category=${
       selectedCategory.value?.id ?? ""
@@ -91,6 +91,45 @@ watch(search, () => {
   skip.value = "";
   cursors.value = [undefined];
 });
+const notif = useNotif();
+const loading = ref(false);
+const deleteForm = async (id: number) => {
+  loading.value = true;
+  try {
+    const res = await $fetch<SResponse<any>>(`/server/treatment/${id}`, {
+      baseURL: runtime,
+      method: "DELETE",
+      headers: app.bearer(),
+    });
+    if (res.data) {
+      notif.success({
+        title: "Success delete treatment",
+      });
+    } else {
+      notif.error({
+        title: "Something Wrong",
+        description: res.message,
+      });
+    }
+    loading.value = false;
+
+    refresh();
+  } catch (error: any) {
+    if (error.data) {
+      const data: SResponse<any> = error.data;
+      notif.error({
+        title: "Something Wrong",
+        description: data.message,
+      });
+    } else {
+      notif.error({
+        title: "Something Wrong",
+        description: "Try again later",
+      });
+    }
+    loading.value = false;
+  }
+};
 </script>
 
 <template>
@@ -102,6 +141,7 @@ watch(search, () => {
         <ULink
           variant="outline"
           size="xs"
+          to="/treatment/add"
           class="text-label_sm border p-2 rounded border-black font-semibold"
           >Add New Treatment</ULink
         >
@@ -179,7 +219,14 @@ watch(search, () => {
       </template>
 
       <template #default="{ data }">
-        <EditDeleteButton :edit="() => {}" :remove="() => {}" />
+        <EditDeleteButton
+          :edit="
+            () => {
+              $router.push(`/treatment/${data.id}/edit`);
+            }
+          "
+          :remove="() => deleteForm(data.id)"
+        />
       </template>
     </VTable>
   </div>

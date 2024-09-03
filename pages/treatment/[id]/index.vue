@@ -2,7 +2,7 @@
 
 <template>
   <div>
-    Page: treatment/[id]
+    Page: treatment/[id]/index
   </div>
 </template>
 

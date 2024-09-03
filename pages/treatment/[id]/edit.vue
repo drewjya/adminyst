@@ -2,7 +2,7 @@
 import type { FormSubmitEvent } from "#ui/types";
 import { z } from "zod";
 import type { SResponse } from "~/lib/app";
-import type { VCabang, VCategory, VTags } from "~/lib/types";
+import type { VCategory, VTags, VTreatment } from "~/lib/types";
 
 const schema = z.object({
   name: z.string().min(2, "Harap isi nama"),
@@ -13,8 +13,6 @@ const schema = z.object({
 
 type Schema = z.output<typeof schema>;
 
-const selectCabang = ref<VCabang>();
-const numberVal = ref<number>();
 const state = reactive<{
   name: string;
   category?: number;
@@ -32,6 +30,27 @@ const runtime = useRuntimeConfig();
 
 const loadingTag = ref(false);
 const selectedTags = ref<VTags>();
+const loadingCategory = ref(false);
+const selectedCategory = ref<VCategory>();
+const route = useRoute();
+const url = computed(() => `/server/treatment/${route.params.id}`);
+
+const { status, data, error } = await useApiFetch(() => url.value, {
+  headers: app.bearer(),
+  transform: (val: SResponse<VTreatment>) => {
+    return val.data;
+  },
+});
+
+watchEffect(() => {
+  const curr = data.value;
+  if (curr) {
+    state.name = curr.nama;
+    state.durasi = curr.durasi;
+    selectedTags.value = curr.tags ?? undefined;
+    selectedCategory.value = curr.category;
+  }
+});
 watch(selectedTags, (val) => {
   state.tag = val?.id;
 });
@@ -51,8 +70,6 @@ async function searchTag(query: string) {
     return <VTags[]>[];
   }
 }
-const loadingCategory = ref(false);
-const selectedCategory = ref<VCategory>();
 watch(selectedCategory, (val) => {
   state.category = val?.id;
 });
@@ -79,12 +96,15 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
   loadingForm.value = true;
   const data = event.data;
   try {
-    const res = await $fetch<SResponse<any>>("/server/treatment", {
-      baseURL: runtime.public.baseUrl,
-      method: "post",
-      headers: app.bearer(),
-      body: data,
-    });
+    const res = await $fetch<SResponse<any>>(
+      `/server/treatment/${route.params.id}`,
+      {
+        baseURL: runtime.public.baseUrl,
+        method: "put",
+        headers: app.bearer(),
+        body: data,
+      }
+    );
     if (res.data) {
       notif.success({
         title: "Success create treatment",
@@ -119,7 +139,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
   <div
     class="flex flex-col max-w-[42rem] w-full gap-5 font-medium justify-center"
   >
-    <h1 class="text-head_5 font-semibold">Add New Treatment</h1>
+    <h1 class="text-head_5 font-semibold">Edit Treatment</h1>
     <UForm
       :state
       :schema

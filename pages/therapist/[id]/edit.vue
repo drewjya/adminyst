@@ -3,6 +3,7 @@ import type { FormSubmitEvent } from "#ui/types";
 import { z } from "zod";
 import type { SResponse } from "~/lib/app";
 import type { VCabang, VTags, VTherapistDetail } from "~/lib/types";
+import { titleCase } from "~/lib/utils";
 
 const Genders = z.enum(["MALE", "FEMALE"]);
 
@@ -167,7 +168,12 @@ const labelTags = computed(() => {
 
 <template>
   <div class="flex flex-col max-w-[42rem] w-full gap-5 font-medium">
-    <h1 class="text-head_5 font-semibold">Add New Therapist</h1>
+    <h1 class="text-head_5 font-semibold">
+      Edit Therapist
+      <span class="font-bold px-2 bg-gray-300 rounded-lg py-0.5">{{
+        titleCase(data?.nama ?? "")
+      }}</span>
+    </h1>
     <UForm
       :state
       :schema
