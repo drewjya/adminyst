@@ -134,3 +134,20 @@ export type VAdmin = {
     nama: string;
   };
 };
+
+
+export type VTherapistDetail = {
+  gender: Gender;
+  no?: string;
+  cabang?: {
+    id: number;
+    nama: string;
+  };
+  nama: string;
+  TherapistSkillTag: {
+    tags: {
+      id: number;
+      name: string;
+    };
+  }[];
+};

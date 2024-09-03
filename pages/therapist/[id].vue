@@ -4,20 +4,34 @@ import { z } from "zod";
 import type { SResponse } from "~/lib/app";
 import type { VCabang } from "~/lib/types";
 
+const Genders = z.enum(["MALE", "FEMALE"]);
+
 const schema = z.object({
-  email: z.string().email("invalid_email"),
-  password: z.string().min(6, "Min 6 characters"),
-  cabang: z.string().min(1, "Must select a branch"),
+  name: z.string().min(2, "Harap isi nama"),
+  no: z.string().optional(),
+  gender: Genders,
+  cabang: z.number().optional(),
 });
+
+
 
 type Schema = z.output<typeof schema>;
 
 const selectCabang = ref<VCabang>();
-
+const numberVal = ref<number>();
 const state = ref<Schema>({
-  email: "",
-  password: "",
-  cabang: "",
+  gender: "MALE",
+  no: undefined,
+  cabang: undefined,
+  name: "",
+});
+
+watch(numberVal, (val) => {
+  if (val) {
+    state.value.no = `${val}`;
+  } else {
+    state.value.no = undefined;
+  }
 });
 const app = useApp();
 const runtime = useRuntimeConfig();
@@ -26,7 +40,7 @@ const loading = ref(false);
 watch(selectCabang, (val) => {
   state.value = {
     ...state.value,
-    cabang: `${val?.id ?? ""}`,
+    cabang: val?.id,
   };
 });
 
@@ -51,22 +65,24 @@ const loadingForm = ref(false);
 const router = useRouter();
 const onSubmit = async (event: FormSubmitEvent<Schema>) => {
   loadingForm.value = true;
+  const data = event.data;
   try {
-    const res = await $fetch<SResponse<any>>("/server/admin", {
+    const res = await $fetch<SResponse<any>>("/server/therapist", {
       baseURL: runtime.public.baseUrl,
       method: "post",
       headers: app.bearer(),
       body: {
-        cabangId: parseInt(event.data.cabang),
-
-        email: event.data.email,
-        password: event.data.password,
+        cabang: data.cabang,
+        gender: data.gender,
+        name: data.name,
+        no: data.no,
       },
     });
     if (res.data) {
       notif.success({
-        title: "Success edit admin",
+        title: "Success create therapist",
       });
+      router.push("/therapist");
     } else {
       notif.error({
         title: "Something Wrong",
@@ -74,8 +90,6 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
       });
     }
     loadingForm.value = false;
-
-    router.push("/admin");
   } catch (error: any) {
     if (error.data) {
       const data: SResponse<any> = error.data;
@@ -96,7 +110,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
 
 <template>
   <div class="flex flex-col max-w-[32rem] w-full gap-5 font-medium">
-    <h1 class="text-head_5 font-semibold">Add New Admin</h1>
+    <h1 class="text-head_5 font-semibold">Add New Therapist</h1>
     <UForm
       :state
       :schema
@@ -108,11 +122,15 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
         }
       "
     >
-      <UFormGroup label="Email" name="email">
-        <UInput placeholder="Insert Email" v-model="state.email" />
+      <UFormGroup label="Name" name="name">
+        <UInput placeholder="Insert Name" v-model="state.name" />
       </UFormGroup>
-      <UFormGroup label="Password" name="password">
-        <UInput placeholder="Insert Password" v-model="state.password" />
+      <UFormGroup label="Gender" name="gender">
+        <USelect
+          placeholder="Select Gender"
+          v-model="state.gender"
+          :options="['MALE', 'FEMALE']"
+        />
       </UFormGroup>
       <UFormGroup label="Cabang" name="cabang">
         <div>
@@ -126,6 +144,13 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
             by="id"
           />
         </div>
+      </UFormGroup>
+      <UFormGroup label="Nomor Id" name="no">
+        <UInput
+          placeholder="Insert Nomor"
+          type="number"
+          v-model.number="numberVal"
+        />
       </UFormGroup>
       <UButton
         color="black"

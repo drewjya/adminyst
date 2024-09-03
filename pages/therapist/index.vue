@@ -57,14 +57,14 @@ const url = computed(() => {
   }`;
 });
 
-const { data, status } = await useApiFetch(() => url.value, {
+const { data, refresh, status } = await useApiFetch(() => url.value, {
   headers: app.bearer(),
   transform: (val: TherapistReq) => {
     return val.data;
   },
 });
 
-const runtime = useRuntimeConfig().public.baseUrl;
+const runtime = useRuntimeConfig();
 async function search(query: string) {
   loading.value = true;
   try {
@@ -72,7 +72,7 @@ async function search(query: string) {
       cabang: VCabang[];
       nextCursor: number | null;
     }> = await $fetch(`/server/cabang?limit=6&query=${query}`, {
-      baseURL: runtime,
+      baseURL: runtime.public.baseUrl,
       headers: app.bearer(),
     });
     loading.value = false;
@@ -108,6 +108,46 @@ const columns: VTableColumn<VTherapist>[] = [
     label: "Cabang",
   },
 ];
+
+const notif = useNotif();
+
+const deleteForm = async (id: number) => {
+  loading.value = true;
+  try {
+    const res = await $fetch<SResponse<any>>(`/server/therapist/${id}`, {
+      baseURL: runtime.public.baseUrl,
+      method: "DELETE",
+      headers: app.bearer(),
+    });
+    if (res.data) {
+      notif.success({
+        title: "Success delete therapist",
+      });
+    } else {
+      notif.error({
+        title: "Something Wrong",
+        description: res.message,
+      });
+    }
+    loading.value = false;
+
+    refresh();
+  } catch (error: any) {
+    if (error.data) {
+      const data: SResponse<any> = error.data;
+      notif.error({
+        title: "Something Wrong",
+        description: data.message,
+      });
+    } else {
+      notif.error({
+        title: "Something Wrong",
+        description: "Try again later",
+      });
+    }
+    loading.value = false;
+  }
+};
 </script>
 
 <template>
@@ -118,6 +158,7 @@ const columns: VTableColumn<VTherapist>[] = [
       <ULink
         variant="outline"
         size="xs"
+        to="/therapist/add"
         class="text-label_sm border px-2 py-1.5 rounded border-black font-semibold"
         >Add New Therapist</ULink
       >
@@ -238,7 +279,10 @@ const columns: VTableColumn<VTherapist>[] = [
         </div>
 
         <div>
-          <EditDeleteButton :edit="() => {}" :remove="() => {}" />
+          <EditDeleteButton
+            :edit="() => {}"
+            :remove="() => deleteForm(data.id)"
+          />
         </div>
       </template>
     </VTable>
