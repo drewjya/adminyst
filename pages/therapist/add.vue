@@ -140,7 +140,9 @@ const labelTags = computed(() => {
 </script>
 
 <template>
-  <div class="flex flex-col max-w-[32rem] w-full gap-5 font-medium">
+  <div
+    class="flex flex-col max-w-[42rem] w-full gap-5 font-medium justify-center"
+  >
     <h1 class="text-head_5 font-semibold">Add New Therapist</h1>
     <UForm
       :state

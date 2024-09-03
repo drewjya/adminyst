@@ -280,7 +280,13 @@ const deleteForm = async (id: number) => {
 
         <div>
           <EditDeleteButton
-            :edit="() => {}"
+            :edit="
+              () => {
+                console.log(data);
+
+                $router.push(`/therapist/${data.id}`);
+              }
+            "
             :remove="() => deleteForm(data.id)"
           />
         </div>

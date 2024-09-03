@@ -95,7 +95,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
 </script>
 
 <template>
-  <div class="flex flex-col max-w-[32rem] w-full gap-5 font-medium">
+  <div class="flex flex-col max-w-[42rem] w-full gap-5 font-medium">
     <h1 class="text-head_5 font-semibold">Add New Admin</h1>
     <UForm
       :state

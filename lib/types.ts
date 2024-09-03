@@ -139,10 +139,7 @@ export type VAdmin = {
 export type VTherapistDetail = {
   gender: Gender;
   no?: string;
-  cabang?: {
-    id: number;
-    nama: string;
-  };
+  cabang?: VCabang;
   nama: string;
   TherapistSkillTag: {
     tags: {
