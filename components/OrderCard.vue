@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { OrderStatus } from "@prisma/client";
-import { Copy } from "lucide-vue-next";
+import type { OrderStatus } from "~/lib/enum";
 import type { State, VOrderDetail } from "~/lib/types";
 import {
   currencyFormat,
@@ -28,38 +27,51 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <Card class="overflow-hidden" v-if="state.loading || state.data">
-    <CardHeader class="flex flex-row justify-between items-start bg-muted/50">
-      <div class="grid gap-0.5">
-        <CardTitle class="group flex items-center gap-2 text-lg">
-          <Skeleton v-if="state.loading" class="h-5 w-52 rounded-md"></Skeleton>
+  <UCard v-if="state.loading || state.data">
+    <template #header>
+      <div
+        class="flex flex-row justify-between items-start bg-muted/50 font-medium sticky top-0"
+      >
+        <div class="grid gap-0.5">
+          <div class="group flex items-center gap-1 text-label_lg font-bold">
+            <Skeleton
+              v-if="state.loading"
+              class="h-5 w-52 rounded-md"
+            ></Skeleton>
 
-          <div v-else-if="state.data">{{ state.data.orderId }}</div>
-          <Button
-            v-if="state.data"
-            size="icon"
+            <div v-else-if="state.data">{{ state.data.orderId }}</div>
+            <UButton
+              v-if="state.data"
+              icon="i-material-symbols:content-copy"
+              variant="soft"
+              size="xs"
+              color="black"
+              class="hover:bg-black/10"
+            />
+          </div>
+          <Skeleton v-if="state.loading" class="w-64 h-4"></Skeleton>
+          <h3 v-else-if="state.data" class="text-label">
+            {{
+              formatDateString(
+                "DD MMM YYYY, HH:mm",
+                new Date(state.data.orderTime!).toString()
+              )
+            }}
+          </h3>
+        </div>
+        <div class="flex items-center">
+          <ULink
+            class="border rounded px-2 py-0.5 border-black text-label_sm"
+            size="sm"
             variant="outline"
-            class="h-6 w-6 opacity-0 transition-opacity group-hover:opacity-100"
+            @click="$router.go(-1)"
+            >Kembali</ULink
           >
-            <Copy class="h-3 w-3" />
-            <span class="sr-only">Copy Order ID</span>
-          </Button>
-        </CardTitle>
-        <Skeleton v-if="state.loading" class="w-64 h-4"></Skeleton>
-        <CardDescription v-else-if="state.data" class="text-lg">{{
-          formatDateString(
-            "DD MMM YYYY, HH:mm",
-            new Date(state.data.orderTime!).toString()
-          )
-        }}</CardDescription>
+        </div>
       </div>
-      <div class="flex">
-        <Button class="ml-4" size="sm" variant="outline" @click="$router.go(-1)"
-          >Kembali</Button
-        >
-      </div>
-    </CardHeader>
-    <CardContent class="p-6 text-sm">
+    </template>
+
+    <div class="p-2 text-sm">
       <div class="flex flex-col gap-3 pb-5">
         <div class="font-semibold">Order Status</div>
         <Skeleton class="w-20 h-4" v-if="state.loading"></Skeleton>
@@ -74,28 +86,30 @@ const emit = defineEmits<{
               state.data.orderStatus !== 'CANCELLED'
             "
           >
-            <DropdownMenu>
-              <DropdownMenuTrigger as-child>
-                <Button size="sm" variant="outline">
-                  <p>Update Status</p>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem
-                  v-for="i in genOrderStatus(
-                    state.data.orderStatus,
-                    state.data.picture !== null &&
-                      state.data.picture !== undefined
-                  )"
-                  @click="emit('select', i)"
-                >
-                  {{ titleCase(i) }}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <UDropdown
+              :items="[
+                genOrderStatus(
+                  state.data.orderStatus,
+                  state.data.picture !== null &&
+                    state.data.picture !== undefined
+                ).map((e) => {
+                  return {
+                    label: titleCase(e),
+                    click: () => emit('select', e),
+                  };
+                }),
+              ]"
+            >
+              <UButton
+                label="Update Status"
+                size="xs"
+                color="black"
+                variant="outline"
+              />
+            </UDropdown>
           </div>
         </div>
-        <Separator />
+        <UDivider />
       </div>
       <div class="grid gap-3">
         <div class="font-semibold">Order Details</div>
@@ -114,7 +128,7 @@ const emit = defineEmits<{
             <span>{{ currencyFormat(i.price) }}</span>
           </li>
         </ul>
-        <Separator class="my-2" />
+        <UDivider />
         <ul class="grid gap-3" v-if="state.data">
           <li class="flex items-center justify-between font-semibold">
             <span class="text-muted-foreground">Total</span>
@@ -125,7 +139,7 @@ const emit = defineEmits<{
           </li>
         </ul>
       </div>
-      <Separator class="my-4" />
+      <UDivider class="my-4" />
       <div class="grid grid-cols-2 gap-4">
         <div class="grid gap-3">
           <div class="font-semibold">Therapist Information</div>
@@ -150,7 +164,7 @@ const emit = defineEmits<{
           </address>
         </div>
       </div>
-      <Separator class="my-4" />
+      <UDivider class="my-4" />
       <div class="grid gap-3">
         <div class="font-semibold">Customer Information</div>
         <dl class="grid gap-3" v-if="state.loading">
@@ -178,7 +192,7 @@ const emit = defineEmits<{
           </div>
         </dl>
       </div>
-      <Separator class="my-4" />
+      <UDivider class="my-4" />
       <div class="grid gap-3">
         <div class="font-semibold">Account Information</div>
         <dl class="grid gap-3" v-if="state.loading">
@@ -227,7 +241,7 @@ const emit = defineEmits<{
           </div>
         </dl>
       </div>
-      <Separator class="my-4" />
+      <UDivider class="my-4" />
       <div class="grid gap-3">
         <div class="font-semibold">Bukti Pembayaran</div>
         <dl class="grid gap-3" v-if="state.loading">
@@ -264,8 +278,8 @@ const emit = defineEmits<{
           </div>
         </div>
       </div>
-    </CardContent>
-  </Card>
+    </div>
+  </UCard>
 </template>
 
 <style scoped></style>
