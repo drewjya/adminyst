@@ -20,6 +20,16 @@ export type VCabang = {
   picture: {
     path: string;
   } | null;
+
+  happyHour?: {
+    publicHoliday: boolean;
+    happyHourDetail: {
+      endDay: number;
+      endHour: string;
+      startDay: number;
+      startHour: string;
+    }[];
+  };
 };
 
 export type VTreatment = {
@@ -30,7 +40,7 @@ export type VTreatment = {
     nama: string;
     id: number;
   };
-  tags: VTags| null;
+  tags: VTags | null;
 };
 
 export type VTherapist = {
@@ -132,7 +142,6 @@ export type VAdmin = {
   };
 };
 
-
 export type VTherapistDetail = {
   gender: Gender;
   no?: string;
@@ -159,8 +168,7 @@ export interface UFormApi {
   errors: Ref<FormError[]>;
 }
 
-export type FormSubmitEvent<T> = SubmitEvent & { data: T }
-
+export type FormSubmitEvent<T> = SubmitEvent & { data: T };
 
 export type Body = BodyInit | Record<string, any> | null;
 export type BodyReq = {
@@ -168,4 +176,32 @@ export type BodyReq = {
   title: string;
   body?: Body;
   onSuccess: () => void;
+};
+
+export type VCabangDetail = {
+  id: number;
+  nama: string;
+  alamat: string;
+  phoneNumber: string;
+  closeHour: string;
+  openHour: string;
+  picture?: {
+    id: number;
+    path: string;
+  };
+  happyHour?: {
+    id: number;
+    publicHoliday: boolean;
+    happyHourDetail?: {
+      id: number;
+      startDay: number;
+      endDay: number;
+      startHour: string;
+      endHour: string;
+    }[];
+  };
+};
+
+export type Optional<T> = {
+  [P in keyof T]?: T[P] extends object ? Optional<T[P]> : T[P] | undefined;
 };

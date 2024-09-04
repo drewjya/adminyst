@@ -52,6 +52,15 @@ const deleteForm = (id: number) =>
     title: "Cabang",
     url: `/server/cabang/${id}`,
   });
+const hari: Record<number, String> = {
+  1: "Senin",
+  2: "Selasa",
+  3: "Rabu",
+  4: "Kamis",
+  5: "Jumat",
+  6: "Sabtu",
+  7: "Minggu",
+};
 </script>
 
 <template>
@@ -92,10 +101,27 @@ const deleteForm = (id: number) =>
           <div class="flex justify-between">
             <ULink
               :to="`/cabang/${i.id}`"
-              class="font-medium text-label text-start flex flex-col items-start w-full hover:bg-gray-100 p-2 rounded-xl"
+              class="font-medium text-label text-start flex flex-col items-start w-full hover:bg-gray-100 p-2 rounded-xl gap-1"
             >
               <div class="text-label_lg font-semibold">{{ i.nama }}</div>
               <div>{{ i.openHour }} - {{ i.closeHour }}</div>
+              <div>
+                <p class="font-semibold">Happy Hour</p>
+                <div v-if="i.happyHour">
+                  <UBadge
+                    v-if="i.happyHour.publicHoliday"
+                    label="Libur Nasional"
+                    color="black"
+                  />
+
+                  <li v-for="hpp in i.happyHour.happyHourDetail">
+                    {{ hari[hpp.startDay] }} - {{ hari[hpp.endDay] }}
+                    <span class="pl-2">
+                      ({{ hpp.startHour }} - {{ hpp.endHour }})
+                    </span>
+                  </li>
+                </div>
+              </div>
             </ULink>
             <div class="rounded-lg">
               <EditDeleteButton

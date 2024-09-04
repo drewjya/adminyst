@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import dayjs from "dayjs";
 import { z } from "zod";
-import type { FormSubmitEvent } from "~/lib/types";
+import type { SResponse } from "~/lib/app";
+import type { FormSubmitEvent, Optional, VCabangDetail } from "~/lib/types";
 
 const MAX_FILE_SIZE = 5000000;
 
@@ -37,8 +38,7 @@ const schema = z.object({
 });
 
 type Schema = z.output<typeof schema>;
-
-const state = reactive<any>({
+const state = reactive<Optional<Schema>>({
   alamat: "Jl something",
   closeHour: "10:00:00",
   happyHour: <
@@ -64,6 +64,35 @@ const state = reactive<any>({
   publicHoliday: false,
   file: undefined,
 });
+const route = useRoute();
+const router = useRouter();
+const app = useApp();
+const { data } = useApiFetch(`/server/cabang/${route.params.id}`, {
+  headers: app.bearer(),
+  transform: (data: SResponse<VCabangDetail>) => {
+    return data.data;
+  },
+});
+
+watch(data, (v) => {
+  if (v) {
+    state.name = v.nama;
+    state.alamat = v.alamat;
+    state.closeHour = v.closeHour;
+    state.openHour = v.openHour;
+    state.publicHoliday = v.happyHour?.publicHoliday;
+    state.happyHour = v.happyHour?.happyHourDetail?.map((e) => {
+      return {
+        id: `${e.id}`,
+        endDay: e.endDay,
+        endHour: e.endHour,
+        startHour: e.startHour,
+        startDay: e.startDay,
+      };
+    });
+  }
+});
+
 const loading = computed(() => api.loading.value);
 const onSubmit = async (e: FormSubmitEvent<Schema>) => {
   const formData = new FormData();
@@ -79,17 +108,17 @@ const onSubmit = async (e: FormSubmitEvent<Schema>) => {
   data.happyHour.forEach((detail, index) => {
     formData.append(`detail[${index}][startDay]`, `${detail.startDay}`);
     formData.append(`detail[${index}][endDay]`, `${detail.endDay}`);
-    formData.append(`detail[${index}][startHour]`, detail.startHour);
-    formData.append(`detail[${index}][endHour]`, detail.endHour);
+    formData.append(`detail[${index}][startHour]`, `${detail.startHour}:00`);
+    formData.append(`detail[${index}][endHour]`, `${detail.endHour}:00`);
   });
 
   formData.append("file", data.file);
 
   api.call({
-    url: "/server/cabang",
-    method: "post",
+    url: `/server/cabang/${route.params.id}`,
+    method: "put",
     onSuccess: () => {
-      useRouter().go(-1);
+      router.go(-1);
     },
     title: "Cabang",
     body: formData,
@@ -97,6 +126,9 @@ const onSubmit = async (e: FormSubmitEvent<Schema>) => {
 };
 
 const addDetail = () => {
+  if (!state.happyHour) {
+    return;
+  }
   state.happyHour.push({
     id: `${dayjs().format("YYYY-MM-DDTHH:mm:ssZ")}`,
     startDay: 1,
@@ -107,6 +139,9 @@ const addDetail = () => {
 };
 
 const removeDetail = (id: string) => {
+  if (!state.happyHour) {
+    return;
+  }
   const find = state.happyHour.findIndex((e: any) => e.id === id);
   console.log(find);
 
@@ -173,9 +208,9 @@ const erorr = ref();
             <div class="flex flex-col gap-2">
               <USelectMenu
                 placeholder="Start"
-                v-model="state.happyHour[index].startDay"
+                v-model="state.happyHour[index]!.startDay"
               />
-              <UInput type="time" v-model="state.happyHour[index].startHour" />
+              <UInput type="time" v-model="state.happyHour[index]!.startHour" />
             </div>
           </UFormGroup>
           <UFormGroup
@@ -190,9 +225,9 @@ const erorr = ref();
             <div class="flex flex-col gap-2">
               <USelectMenu
                 placeholder="End"
-                v-model="state.happyHour[index].endDay"
+                v-model="state.happyHour[index]!.endDay"
               />
-              <UInput type="time" v-model="state.happyHour[index].endHour" />
+              <UInput type="time" v-model="state.happyHour[index]!.endHour" />
             </div>
           </UFormGroup>
           <div class="flex items-center">
@@ -201,7 +236,7 @@ const erorr = ref();
               icon="i-carbon:close"
               color="black"
               type="button"
-              @click="removeDetail(i.id)"
+              @click="removeDetail(i!.id!)"
             />
           </div>
         </div>

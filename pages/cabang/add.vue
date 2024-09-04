@@ -81,8 +81,8 @@ const onSubmit = async (e: FormSubmitEvent<Schema>) => {
   data.happyHour.forEach((detail, index) => {
     formData.append(`detail[${index}][startDay]`, `${detail.startDay}`);
     formData.append(`detail[${index}][endDay]`, `${detail.endDay}`);
-    formData.append(`detail[${index}][startHour]`, detail.startHour);
-    formData.append(`detail[${index}][endHour]`, detail.endHour);
+    formData.append(`detail[${index}][startHour]`, detail.startHour + ":00");
+    formData.append(`detail[${index}][endHour]`, detail.endHour + ":00");
   });
 
   formData.append("file", data.file);
