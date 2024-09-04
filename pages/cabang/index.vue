@@ -10,7 +10,7 @@ type CabangReq = SResponse<{
   nextCursor: number | null;
 }>;
 const app = useApp();
-const { data, status } = await useApiFetch(
+const { data, status, refresh } = await useApiFetch(
   () => `/server/cabang?limit=6&cursor=${skip.value}`,
   {
     headers: app.bearer(),
@@ -43,6 +43,15 @@ const setCursor = (val: "prev" | "next") => {
 
   return;
 };
+
+const deleteCabang = useDeleteForm();
+
+const deleteForm = (id: number) =>
+  deleteCabang.call({
+    onSuccess: () => refresh(),
+    title: "Cabang",
+    url: `/server/cabang/${id}`,
+  });
 </script>
 
 <template>
@@ -91,7 +100,7 @@ const setCursor = (val: "prev" | "next") => {
             <div class="rounded-lg">
               <EditDeleteButton
                 :edit="() => $router.push(`/cabang/${i.id}/edit`)"
-                :remove="() => {}"
+                :remove="() => deleteForm(i.id)"
                 class="w-full rounded-xl"
               />
             </div>

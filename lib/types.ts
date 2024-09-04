@@ -160,3 +160,12 @@ export interface UFormApi {
 }
 
 export type FormSubmitEvent<T> = SubmitEvent & { data: T }
+
+
+export type Body = BodyInit | Record<string, any> | null;
+export type BodyReq = {
+  url: string;
+  title: string;
+  body?: Body;
+  onSuccess: () => void;
+};
