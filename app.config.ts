@@ -13,6 +13,11 @@ export default defineAppConfig({
         },
       },
     },
+    formGroup: {
+      label: {
+        base: "text-label font-semibold",
+      },
+    },
     card: {
       header: {
         padding: "p-2",

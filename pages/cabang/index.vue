@@ -50,7 +50,9 @@ const setCursor = (val: "prev" | "next") => {
     class="flex flex-col gap-2 w-[calc(100svw-2rem)] md:w-[calc(100svw-4rem)]"
   >
     <div class="flex items-center justify-between">
-      <UButton variant="outline" size="sm">Add New Cabang</UButton>
+      <ULink class="px-2 py-1 border border-black rounded-md" to="/cabang/add"
+        >Add New Cabang</ULink
+      >
     </div>
     <div
       class="h-48 bg-stone-200 rounded flex justify-center items-center"
@@ -65,8 +67,11 @@ const setCursor = (val: "prev" | "next") => {
       <div class="font-medium">No Data</div>
     </div>
     <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4 lg:grid-cols-3">
-      <UCard v-for="i in data?.cabang" class="flex flex-col justify-between">
-        <template #header>
+      <div
+        v-for="i in data?.cabang"
+        class="grid grid-rows-[auto_5rem_5fr] space-y-2 divide-y border border-black/10 rounded-lg"
+      >
+        <div data-role="header" class="p-3 pb-0 gap-1 flex flex-col">
           <div class="flex justify-center bg-slate-100 rounded-t">
             <NuxtImg
               class="w-52"
@@ -75,29 +80,36 @@ const setCursor = (val: "prev" | "next") => {
             </NuxtImg>
           </div>
 
-          <div class="font-medium text-label">
-            <div class="text-label_lg font-semibold">{{ i.nama }}</div>
-            <div>{{ i.openHour }} - {{ i.closeHour }}</div>
+          <div class="flex justify-between">
+            <ULink
+              :to="`/cabang/${i.id}`"
+              class="font-medium text-label text-start flex flex-col items-start w-full hover:bg-gray-100 p-2 rounded-xl"
+            >
+              <div class="text-label_lg font-semibold">{{ i.nama }}</div>
+              <div>{{ i.openHour }} - {{ i.closeHour }}</div>
+            </ULink>
+            <div class="rounded-lg">
+              <EditDeleteButton
+                :edit="() => $router.push(`/cabang/${i.id}/edit`)"
+                :remove="() => {}"
+                class="w-full rounded-xl"
+              />
+            </div>
           </div>
-        </template>
-        <div class="font-medium text-label">
-          <div>
+        </div>
+        <div
+          data-role="body"
+          class="font-medium flex flex-col gap-1 items-start py-2 text-start justify-center px-3"
+        >
+          <div class="text-label">
             {{ i.alamat }}
           </div>
 
-          <div>
+          <div class="text-label_sm">
             {{ i.phoneNumber }}
           </div>
         </div>
-        <template #footer>
-          <div class="flex gap-2">
-            <UButton class="bg-blue-700 hover:bg-blue-500" size="sm"
-              >Edit</UButton
-            >
-            <UButton class="bg-red-700" size="sm">Hapus</UButton>
-          </div>
-        </template>
-      </UCard>
+      </div>
     </div>
     <div class="flex gap-2 justify-end">
       <UButton

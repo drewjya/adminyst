@@ -2,7 +2,7 @@
 
 <template>
   <div>
-    Page: cabang/[id]
+    Page: cabang/[id]/edit
   </div>
 </template>
 

@@ -134,7 +134,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
       <UFormGroup label="Name" name="name">
         <UInput placeholder="Insert Name" v-model="state.name" />
       </UFormGroup>
-      <UFormGroup label="Gender" name="gender">
+      <UFormGroup label="Durasi" name="durasi">
         <UInput
           placeholder="Insert Durasi"
           type="number"
@@ -154,6 +154,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
           />
         </div>
       </UFormGroup>
+
       <UFormGroup label="Tags" name="tag">
         <USelectMenu
           v-model="selectedTags"

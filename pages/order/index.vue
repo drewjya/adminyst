@@ -30,6 +30,21 @@ type OrderReq = SResponse<{
   nextCursor: number | null;
 }>;
 
+const resetDate = () => {
+  return {
+    start: new Date(
+      initDate.getFullYear(),
+      initDate.getMonth(),
+      initDate.getDate()
+    ),
+    end: new Date(
+      initDate.getFullYear(),
+      initDate.getMonth() + 1,
+      initDate.getDate()
+    ),
+  };
+};
+
 const route = useRoute();
 const router = useRouter();
 const url = computed(
@@ -101,39 +116,28 @@ const watcher = watchIgnorable(
   }
 );
 
-const resetDate = () => {
-  return {
-    start: new Date(
-      initDate.getFullYear(),
-      initDate.getMonth(),
-      initDate.getDate()
-    ),
-    end: new Date(
-      initDate.getFullYear(),
-      initDate.getMonth() + 1,
-      initDate.getDate()
-    ),
-  };
-};
-
 onMounted(() => {
+  const {
+    gender: genderVal,
+    status,
+    start,
+    end,
+    email: emailVal,
+    phone: phoneVal,
+    cursor,
+    no,
+    therapist: therapistVal,
+    name,
+  } = route.query;
+  const startDate = start ? new Date(`${start}`) : undefined;
+  const endDate = end ? new Date(`${end}`) : undefined;
+
+  if (!(startDate && endDate)) {
+    date.value = resetDate();
+  }
   watcher.ignoreUpdates(() => {
-    const {
-      gender: genderVal,
-      status,
-      start,
-      end,
-      email: emailVal,
-      phone: phoneVal,
-      cursor,
-      no,
-      therapist: therapistVal,
-      name,
-    } = route.query;
     console.log(start, end);
 
-    const startDate = start ? new Date(`${start}`) : undefined;
-    const endDate = end ? new Date(`${end}`) : undefined;
     console.log(startDate, endDate);
 
     if (startDate && endDate) {
@@ -141,8 +145,6 @@ onMounted(() => {
         start: startDate,
         end: endDate,
       };
-    } else {
-      date.value = resetDate();
     }
     gender.value = genderVal ? (genderVal as Gender) : undefined;
     orderStatus.value = status ? (status as OrderStatus) || "" : "";

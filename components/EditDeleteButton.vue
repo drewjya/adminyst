@@ -1,23 +1,32 @@
 <script setup lang="ts">
 const { edit, remove } = defineProps<{
-  edit: () => void;
-  remove: () => void;
+  edit?: () => void;
+  remove?: () => void;
 }>();
 
 const items = [
   [
-    {
-      label: "Edit",
-      icon: "i-heroicons-pencil-square-20-solid",
-      shortcuts: ["E"],
-      click: edit,
-    },
-    {
-      label: "Remove",
-      icon: "i-heroicons-trash-20-solid",
-      shortcuts: ["⌘", "D"],
-      click: remove,
-    },
+    ...(edit
+      ? [
+          {
+            label: "Edit",
+            icon: "i-heroicons-pencil-square-20-solid",
+
+            click: edit,
+          },
+        ]
+      : []),
+
+    ...(remove
+      ? [
+          {
+            label: "Remove",
+            icon: "i-heroicons-trash-20-solid",
+
+            click: remove,
+          },
+        ]
+      : []),
   ],
 ];
 </script>
