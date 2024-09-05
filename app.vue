@@ -4,6 +4,7 @@
   <NuxtLayout>
     <NuxtPage> </NuxtPage>
   </NuxtLayout>
+  <UModals />
   <UNotifications />
   <USlideovers />
 </template>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { watchIgnorable } from "@vueuse/core";
+import CabangTherapistModal from "~/components/CabangTherapistModal.vue";
 import type { SResponse } from "~/lib/app";
 import type { Gender } from "~/lib/enum";
 import type { VTherapist } from "~/lib/types";
@@ -65,6 +66,35 @@ const reset = () => {
   searchName.value = "";
   searchNo.value = "";
 };
+const deleteS = useApi();
+const deleteTherapist = (id: number) =>
+  deleteS.call({
+    url: `/server/cabangtherapist/${id}?cabang=${route.params.id}`,
+    method: "delete",
+    title: "Therapist Cabang",
+    onSuccess: refresh,
+  });
+
+const selectTherapist = (id: number) =>
+  deleteS.call({
+    url: `/server/cabangtherapist/${id}?cabang=${route.params.id}`,
+    method: "post",
+    title: "Therapist Cabang",
+    onSuccess: () => {
+      modal.close();
+      refresh();
+    },
+  });
+
+const modal = useModal();
+
+const open = () => {
+  modal.open(CabangTherapistModal, {
+    onSelect: (id) => {
+      selectTherapist(id);
+    },
+  });
+};
 </script>
 
 <template>
@@ -86,6 +116,12 @@ const reset = () => {
         :display="(v) => titleCase(v)"
       ></VDropdown>
     </UFormGroup>
+    <UButton
+      label="Add Cabang Therapist"
+      size="sm"
+      color="black"
+      @click="open"
+    />
   </div>
   <UCard>
     <template #header>
@@ -98,7 +134,9 @@ const reset = () => {
     <div
       class="grid"
       :style="{
-        gridTemplateColumns: 'repeat(4, auto)',
+        gridTemplateColumns: `repeat(${
+          (therapists ?? []).length === 0 ? '4' : '5'
+        }, auto)`,
       }"
     >
       <div
@@ -108,16 +146,17 @@ const reset = () => {
         <div>Name</div>
         <div>Gender</div>
         <div>Cabang</div>
+        <div v-if="(therapists ?? []).length !== 0">Action</div>
       </div>
       <div
         v-if="therapistStatus === 'pending'"
-        class="h-40 grid place-items-center"
+        class="h-40 grid place-items-center col-span-full"
       >
         <LoadingSpinner />
       </div>
       <div
         v-else-if="(therapists ?? []).length === 0"
-        class="h-40 grid place-items-center"
+        class="h-40 grid place-items-center col-span-full"
       >
         <div>Belum Ada Treatment</div>
       </div>
@@ -134,6 +173,12 @@ const reset = () => {
           <div>{{ titleCase(i.gender) }}</div>
           <div>
             {{ i.cabang?.nama }}
+          </div>
+          <div>
+            <EditDeleteButton
+              :edit="() => {}"
+              :remove="() => deleteTherapist(i.id)"
+            />
           </div>
         </div>
       </template>

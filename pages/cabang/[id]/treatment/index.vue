@@ -120,7 +120,9 @@ const reset = () => {
     <div
       class="grid"
       :style="{
-        gridTemplateColumns: 'repeat(4, auto)',
+        gridTemplateColumns: `repeat(${
+          (treatments ?? []).length === 0 ? '4' : '5'
+        }, auto)`,
       }"
     >
       <div
@@ -130,6 +132,7 @@ const reset = () => {
         <div>Category</div>
         <div>Tag</div>
         <div>Harga</div>
+        <div v-if="(treatments ?? []).length !== 0">Action</div>
       </div>
       <div
         v-if="treatmentStatus === 'pending'"
@@ -174,6 +177,9 @@ const reset = () => {
             <UBadge v-if="i.treatment.category.happyHourPrice" color="lime">
               {{ currencyFormat(i.happyHourPrice) }}
             </UBadge>
+          </div>
+          <div>
+            <EditDeleteButton :edit="() => {}" :remove="() => {}" />
           </div>
         </div>
       </template>
