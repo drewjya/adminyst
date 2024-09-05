@@ -3,7 +3,7 @@ import { watchIgnorable } from "@vueuse/core";
 import type { SResponse } from "~/lib/app";
 import type { Gender } from "~/lib/enum";
 import type { VCabang, VTableColumn, VTherapist } from "~/lib/types";
-import { genderList, titleCase } from "~/lib/utils";
+import { formatDateString, genderList, titleCase } from "~/lib/utils";
 type Cur = number | undefined;
 const cursors = ref<Cur[]>([undefined]);
 const skip = ref("");
@@ -256,9 +256,21 @@ const deleteForm = async (id: number) => {
             label="Check In"
           />
 
-          <p v-else>
-            {{ data.attendance?.checkIn?.toString() }}
-          </p>
+          <div v-else class="flex flex-col items-center">
+            <p class="font-semibold">
+              {{
+                formatDateString("HH:mm:ss", data.attendance.checkIn.toString())
+              }}
+            </p>
+            <p class="text-label_sm">
+              {{
+                formatDateString(
+                  "DD-MM-YYYY",
+                  data.attendance.checkIn.toString()
+                )
+              }}
+            </p>
+          </div>
         </div>
 
         <div class="flex justify-center">
@@ -273,9 +285,24 @@ const deleteForm = async (id: number) => {
             class="text-black"
             variant="outline"
           />
-          <p v-else>
-            {{ data.attendance?.checkOut?.toString() }}
-          </p>
+          <div v-else class="flex flex-col items-center">
+            <p class="font-semibold">
+              {{
+                formatDateString(
+                  "HH:mm:ss",
+                  data.attendance.checkOut.toString()
+                )
+              }}
+            </p>
+            <p class="text-label_sm">
+              {{
+                formatDateString(
+                  "DD-MM-YYYY",
+                  data.attendance.checkOut.toString()
+                )
+              }}
+            </p>
+          </div>
         </div>
 
         <div>

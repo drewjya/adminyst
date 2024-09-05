@@ -219,12 +219,12 @@ const open = () => {
             />
 
             <div v-else class="flex flex-col items-center">
-              <p class="text-label_sm">
+              <p class="font-semibold">
                 {{
                   formatDateString("HH:mm:ss", i.attendance.checkIn.toString())
                 }}
               </p>
-              <p>
+              <p class="text-label_sm">
                 {{
                   formatDateString(
                     "DD-MM-YYYY",
@@ -249,12 +249,12 @@ const open = () => {
               variant="outline"
             />
             <div v-else class="flex flex-col items-center">
-              <p class="text-label_sm">
+              <p class="font-semibold">
                 {{
                   formatDateString("HH:mm:ss", i.attendance.checkOut.toString())
                 }}
               </p>
-              <p>
+              <p class="text-label_sm">
                 {{
                   formatDateString(
                     "DD-MM-YYYY",
