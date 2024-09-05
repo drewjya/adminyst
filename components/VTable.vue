@@ -30,7 +30,7 @@ withDefaults(
 </script>
 
 <template>
-  <div class="flex gap-5">
+  <div class="flex gap-5 pb-2">
     <UInput
       placeholder="Search"
       v-model="search"

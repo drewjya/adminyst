@@ -1,31 +1,45 @@
 <script setup lang="ts">
-const items = [
+const user = useApp();
+
+const items = ref([
   [
     {
-      label: "ben@example.com",
+      label: "",
       slot: "account",
       disabled: true,
     },
   ],
-  [
-    {
-      label: "Settings",
-      icon: "i-heroicons-cog-8-tooth",
-    },
-  ],
-  [
-    {
-      label: "Documentation",
-      icon: "i-heroicons-book-open",
-    },
-  ],
+
   [
     {
       label: "Sign out",
       icon: "i-heroicons-arrow-left-on-rectangle",
+      click: () => user.logout(),
     },
   ],
-];
+]);
+
+watchEffect(() => {
+  if (user.user) {
+    items.value = [
+      [
+        {
+          label: `${user.user.email}`,
+          slot: "account",
+          disabled: true,
+        },
+      ],
+
+      [
+        {
+          label: "Sign out",
+          icon: "i-heroicons-arrow-left-on-rectangle",
+          click: () => user.logout(),
+        },
+      ],
+    ];
+  }
+});
 </script>
 
 <template>
@@ -34,7 +48,7 @@ const items = [
     :ui="{ item: { disabled: 'cursor-text select-text' } }"
     :popper="{ placement: 'left' }"
   >
-    <UAvatar src="https://avatars.githubusercontent.com/u/739984?v=4" />
+    <UBadge :label="user.user?.name" color="black" />
 
     <template #account="{ item }">
       <div class="text-left">

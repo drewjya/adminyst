@@ -25,10 +25,7 @@ const email = ref("");
 const initDate = new Date();
 const phone = ref("");
 
-type OrderReq = SResponse<{
-  order: VOrder[];
-  nextCursor: number | null;
-}>;
+
 
 const resetDate = () => {
   return {
@@ -69,7 +66,10 @@ const app = useApp();
 const orderStatus = ref<OrderStatus | "">("");
 const gender = ref<Gender | undefined>();
 const listStatus = [...orderStatusList(), ""];
-
+type OrderReq = SResponse<{
+  order: VOrder[];
+  nextCursor: number | null;
+}>;
 const { status, data, error } = await useApiFetch(() => url.value, {
   headers: app.bearer(),
   transform: (val: OrderReq) => {

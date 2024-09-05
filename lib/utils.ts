@@ -164,3 +164,13 @@ export const percentageVal = (profit: Profit, val: "week" | "month") => {
   }
   return `same from the last ${val}`;
 };
+
+export const hari: Record<number, String> = {
+  1: "Senin",
+  2: "Selasa",
+  3: "Rabu",
+  4: "Kamis",
+  5: "Jumat",
+  6: "Sabtu",
+  7: "Minggu",
+};

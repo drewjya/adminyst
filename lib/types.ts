@@ -36,13 +36,9 @@ export type VTreatment = {
   id: number;
   nama: string;
   durasi: number;
-  category: {
-    nama: string;
-    id: number;
-  };
+  category: VCategory;
   tags: VTags | null;
 };
-
 export type VTherapist = {
   id: number;
   gender: Gender;
@@ -121,6 +117,8 @@ export type VTags = {
 export type VCategory = {
   id: number;
   nama: string;
+  optional: boolean;
+  happyHourPrice: boolean;
 };
 
 export type VBanner = {
@@ -204,4 +202,10 @@ export type VCabangDetail = {
 
 export type Optional<T> = {
   [P in keyof T]?: T[P] extends object ? Optional<T[P]> : T[P] | undefined;
+};
+
+export type VCabangTreatment = {
+  price: number;
+  happyHourPrice: number;
+  treatment: VTreatment;
 };

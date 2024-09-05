@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { SResponse } from "~/lib/app";
 import type { VCabang } from "~/lib/types";
+import { hari } from "~/lib/utils";
 
 const skip = ref("");
 type Cur = number | undefined;
@@ -52,15 +53,6 @@ const deleteForm = (id: number) =>
     title: "Cabang",
     url: `/server/cabang/${id}`,
   });
-const hari: Record<number, String> = {
-  1: "Senin",
-  2: "Selasa",
-  3: "Rabu",
-  4: "Kamis",
-  5: "Jumat",
-  6: "Sabtu",
-  7: "Minggu",
-};
 </script>
 
 <template>

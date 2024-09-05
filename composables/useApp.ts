@@ -15,9 +15,9 @@ export const useApp = defineStore("global-app-store", () => {
 
   const bearer = () => {
     return {
-      Authorization:`Bearer ${accessToken.value??'invalid_token'}`
-    }
-  }
+      Authorization: `Bearer ${accessToken.value ?? "invalid_token"}`,
+    };
+  };
   const refresh = async () => {
     try {
       const res = await $fetch<SResponse<AuthRes>>("/auth/refresh", {
@@ -80,9 +80,18 @@ export const useApp = defineStore("global-app-store", () => {
       }
     }
   };
+
+  const logout = () => {
+    accessToken.value = undefined;
+    refreshToken.value = undefined;
+    user.value = undefined;
+    router.push("/login");
+  };
   return {
     refresh,
     login,
     bearer,
+    user,
+    logout,
   };
 });
