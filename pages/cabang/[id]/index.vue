@@ -45,7 +45,7 @@ const {
 });
 
 const { data: treatments, status: treatmentStatus } = useApiFetch(
-  `/server/cabangtreatment?limit=7&cabangId=1`,
+  `/server/cabangtreatment?limit=7&cabangId=${route.params.id}`,
   {
     headers: app.bearer(),
     transform: (val: TreatmentReq) => {
@@ -63,7 +63,7 @@ const {
   data: therapists,
   refresh,
   status: therapistStatus,
-} = useApiFetch(`/server/therapist?limit=7&cabang${route.params.id}`, {
+} = useApiFetch(`/server/therapist?limit=7&cabang=${route.params.id ?? ""}`, {
   headers: app.bearer(),
   transform: (val: TherapistReq) => {
     return val.data?.therapist ?? [];
