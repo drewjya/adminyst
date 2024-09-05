@@ -54,7 +54,7 @@ const deleteForm = async (id: number) => {
 </script>
 
 <template>
-  <div class="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
+  <!-- <div class="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
     <UCard x-chunk="dashboard-01-chunk-0">
       <template
         #header
@@ -107,7 +107,7 @@ const deleteForm = async (id: number) => {
         <p class="text-xs text-muted-foreground">+201 since last hour</p>
       </CardContent>
     </UCard>
-  </div>
+  </div> -->
 
   <div
     class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 w-full gap-2 auto-rows-auto"

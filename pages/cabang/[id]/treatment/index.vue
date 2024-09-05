@@ -34,19 +34,20 @@ const ignore = watchIgnorable([search], () => {
 
 onMounted(() => {
   ignore.ignoreUpdates(() => {
-    search.value = `${route.query.query ?? ""}`;
+    search.value = `${route.query.search ?? ""}`;
   });
 });
 
-const { data: treatments, status: treatmentStatus } = useApiFetch(
-  () => url.value,
-  {
-    headers: app.bearer(),
-    transform: (val: TreatmentReq) => {
-      return val.data;
-    },
-  }
-);
+const {
+  data: treatments,
+  status: treatmentStatus,
+  refresh,
+} = useApiFetch(() => url.value, {
+  headers: app.bearer(),
+  transform: (val: TreatmentReq) => {
+    return val.data;
+  },
+});
 
 const searchApi = useSearch();
 const searchCategory = async (query: string) =>
@@ -81,42 +82,63 @@ const reset = () => {
   search.value = "";
   selectedCategory.value = undefined;
 };
+
+// const modal = useModal();
+
+const open = () => {
+  router.push(`/cabang/${route.params.id}/treatment/add`);
+  // modal.open(AddCabangTreatmentModal, {});
+};
+
+const deleteS = useApi();
+const deleteTreatment = (id: number) =>
+  deleteS.call({
+    url: `/server/cabangtreatment/${id}?cabang=${route.params.id}`,
+    method: "delete",
+    title: "Therapist Cabang",
+    onSuccess: refresh,
+  });
 </script>
 
 <template>
-  <div class="max-w-[30rem]">
-    <UFormGroup label="Category">
-      <USelectMenu
-        placeholder="Search Category"
-        :loading="searchApi.loading.value"
-        :searchable="searchCategory"
-        option-attribute="nama"
-        by="id"
-        v-model="selectedCategory"
-      />
-    </UFormGroup>
-    <UFormGroup label="Tags">
-      <USelectMenu
-        placeholder="Search Tags"
-        :loading="searchTagAPi.loading.value"
-        :searchable="searchTags"
-        option-attribute="name"
-        by="id"
-        v-model="selectedTags"
-      />
-    </UFormGroup>
-    <UFormGroup label="Name">
-      <UInput v-model="search" placeholder="Search Name" />
-    </UFormGroup>
-  </div>
-
   <UCard>
     <template #header>
-      <div class="flex items-center justify-between">
+      <div class="flex items-center justify-between sticky top-0">
         <p class="font-semibold text-label_lg">Treatment</p>
         <UButton label="Reset" size="xs" color="black" @click="reset" />
       </div>
     </template>
+    <div class="max-w-[30rem] flex flex-col gap-2 pb-3">
+      <UFormGroup label="Category">
+        <USelectMenu
+          placeholder="Search Category"
+          :loading="searchApi.loading.value"
+          :searchable="searchCategory"
+          option-attribute="nama"
+          by="id"
+          v-model="selectedCategory"
+        />
+      </UFormGroup>
+      <UFormGroup label="Tags">
+        <USelectMenu
+          placeholder="Search Tags"
+          :loading="searchTagAPi.loading.value"
+          :searchable="searchTags"
+          option-attribute="name"
+          by="id"
+          v-model="selectedTags"
+        />
+      </UFormGroup>
+      <UFormGroup label="Name">
+        <UInput v-model="search" placeholder="Search Name" />
+      </UFormGroup>
+      <UButton
+        size="xs"
+        label="Add New Treatment"
+        @click="open"
+        color="black"
+      />
+    </div>
     <div
       class="grid"
       :style="{
@@ -135,7 +157,7 @@ const reset = () => {
         <div v-if="(treatments ?? []).length !== 0">Action</div>
       </div>
       <div
-        v-if="treatmentStatus === 'pending'"
+        v-if="treatmentStatus === 'pending' || deleteS.loading.value"
         class="h-40 grid place-items-center col-span-full"
       >
         <LoadingSpinner />
@@ -148,12 +170,12 @@ const reset = () => {
       </div>
       <template v-else>
         <div
-          class="grid col-span-full grid-cols-subgrid p-2 text-label font-medium"
+          class="grid col-span-full grid-cols-subgrid p-2 text-label font-medium gap-2"
           v-for="i in treatments"
         >
           <div>{{ i.treatment.nama }}</div>
 
-          <div>
+          <div class="flex justify-center items-center flex-col px-2">
             <div>
               {{ i.treatment.category.nama }}
             </div>
@@ -179,7 +201,15 @@ const reset = () => {
             </UBadge>
           </div>
           <div>
-            <EditDeleteButton :edit="() => {}" :remove="() => {}" />
+            <EditDeleteButton
+              :edit="
+                () =>
+                  $router.push(
+                    `/cabang/${route.params.id}/treatment/${i.treatment.id}/edit`
+                  )
+              "
+              :remove="() => deleteTreatment(i.treatment.id)"
+            />
           </div>
         </div>
       </template>

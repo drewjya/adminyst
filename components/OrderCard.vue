@@ -36,10 +36,10 @@ watchEffect(() => {
       >
         <div class="grid gap-0.5">
           <div class="group flex items-center gap-1 text-label_lg font-bold">
-            <Skeleton
+            <USkeleton
               v-if="state.loading"
               class="h-5 w-52 rounded-md"
-            ></Skeleton>
+            ></USkeleton>
 
             <div v-else-if="state.data">{{ state.data.orderId }}</div>
             <UButton
@@ -51,7 +51,7 @@ watchEffect(() => {
               class="hover:bg-black/10"
             />
           </div>
-          <Skeleton v-if="state.loading" class="w-64 h-4"></Skeleton>
+          <USkeleton v-if="state.loading" class="w-64 h-4"></USkeleton>
           <h3 v-else-if="state.data" class="text-label">
             {{
               formatDateString(
@@ -76,7 +76,7 @@ watchEffect(() => {
     <div class="p-2 text-sm">
       <div class="flex flex-col gap-3 pb-5">
         <div class="font-semibold">Order Status</div>
-        <Skeleton class="w-20 h-4" v-if="state.loading"></Skeleton>
+        <USkeleton class="w-20 h-4" v-if="state.loading"></USkeleton>
         <div v-else-if="state.data" class="flex justify-between">
           <VBadgeStatus :status="state.data.orderStatus" />
 
@@ -117,8 +117,8 @@ watchEffect(() => {
         <div class="font-semibold">Order Details</div>
         <ul class="grid gap-3" v-if="state.loading">
           <li class="flex items-center justify-between" v-for="i in 3">
-            <Skeleton class="h-4 w-32"></Skeleton>
-            <Skeleton class="h-4 w-20"></Skeleton>
+            <USkeleton class="h-4 w-32"></USkeleton>
+            <USkeleton class="h-4 w-20"></USkeleton>
           </li>
         </ul>
         <ul class="grid gap-3" v-else-if="state.data">
@@ -134,7 +134,7 @@ watchEffect(() => {
         <ul class="grid gap-3" v-if="state.data">
           <li class="flex items-center justify-between font-semibold">
             <span class="text-muted-foreground">Total</span>
-            <Skeleton v-if="state.loading" class="w-24 h-4"></Skeleton>
+            <USkeleton v-if="state.loading" class="w-24 h-4"></USkeleton>
             <span v-else-if="state.data">{{
               currencyFormat(state.data.totalPrice)
             }}</span>
@@ -146,8 +146,8 @@ watchEffect(() => {
         <div class="grid gap-3">
           <div class="font-semibold">Therapist Information</div>
           <div v-if="state.loading">
-            <Skeleton class="h-4 w-20"></Skeleton>
-            <Skeleton class="h-4 w-20"></Skeleton>
+            <USkeleton class="h-4 w-20"></USkeleton>
+            <USkeleton class="h-4 w-20"></USkeleton>
           </div>
           <address
             class="grid gap-0.5 not-italic text-muted-foreground"
@@ -172,12 +172,12 @@ watchEffect(() => {
         <dl class="grid gap-3" v-if="state.loading">
           <div class="flex items-center justify-between">
             <dt class="text-muted-foreground">Gender Customer</dt>
-            <Skeleton class="w-11 h-4"></Skeleton>
+            <USkeleton class="w-11 h-4"></USkeleton>
           </div>
 
           <div class="flex items-center justify-between">
             <dt class="text-muted-foreground">No WA Customer</dt>
-            <Skeleton class="w-24 h-4"></Skeleton>
+            <USkeleton class="w-24 h-4"></USkeleton>
           </div>
         </dl>
         <dl class="grid gap-3" v-else-if="state.data">
@@ -200,17 +200,17 @@ watchEffect(() => {
         <dl class="grid gap-3" v-if="state.loading">
           <div class="flex items-center justify-between">
             <dt class="text-muted-foreground">Nama User</dt>
-            <Skeleton class="w-11 h-4"></Skeleton>
+            <USkeleton class="w-11 h-4"></USkeleton>
           </div>
 
           <div class="flex items-center justify-between">
             <dt class="text-muted-foreground">No WA User</dt>
-            <Skeleton class="w-24 h-4"></Skeleton>
+            <USkeleton class="w-24 h-4"></USkeleton>
           </div>
 
           <div class="flex items-center justify-between">
             <dt class="text-muted-foreground">Email User</dt>
-            <Skeleton class="w-24 h-4"></Skeleton>
+            <USkeleton class="w-24 h-4"></USkeleton>
           </div>
         </dl>
         <dl class="grid gap-3" v-else-if="state.data">
@@ -247,7 +247,7 @@ watchEffect(() => {
       <div class="grid gap-3">
         <div class="font-semibold">Bukti Pembayaran</div>
         <dl class="grid gap-3" v-if="state.loading">
-          <Skeleton class="w-screen h-40"></Skeleton>
+          <USkeleton class="w-screen h-40"></USkeleton>
         </dl>
         <div
           class="rounded border bg-slate-100 flex justify-center min-h-40 items-center"

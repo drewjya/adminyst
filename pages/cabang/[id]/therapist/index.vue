@@ -175,10 +175,7 @@ const open = () => {
             {{ i.cabang?.nama }}
           </div>
           <div>
-            <EditDeleteButton
-              :edit="() => {}"
-              :remove="() => deleteTherapist(i.id)"
-            />
+            <EditDeleteButton :remove="() => deleteTherapist(i.id)" />
           </div>
         </div>
       </template>
