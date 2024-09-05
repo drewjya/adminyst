@@ -25,17 +25,17 @@ export const useSidebar = () => {
       link: "/therapist",
     },
     {
-      title: "Analytic",
-      link: "/analytic",
-    },
-    {
       title: "Admins",
       link: "/admin",
     },
-    {
-      title: "Customer",
-      link: "/customer",
-    },
+    // {
+    //   title: "Customer",
+    //   link: "/customer",
+    // },
+    // {
+    //   title: "Analytic",
+    //   link: "/analytic",
+    // },
   ]);
 
   return {

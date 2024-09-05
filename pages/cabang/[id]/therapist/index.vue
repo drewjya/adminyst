@@ -4,7 +4,7 @@ import CabangTherapistModal from "~/components/CabangTherapistModal.vue";
 import type { SResponse } from "~/lib/app";
 import type { Gender } from "~/lib/enum";
 import type { VTherapist } from "~/lib/types";
-import { genderList, titleCase } from "~/lib/utils";
+import { formatDateString, genderList, titleCase } from "~/lib/utils";
 
 type TherapistReq = SResponse<{
   therapist: VTherapist[];
@@ -58,7 +58,22 @@ const {
 } = useApiFetch(() => url.value, {
   headers: app.bearer(),
   transform: (val: TherapistReq) => {
-    return val.data?.therapist ?? [];
+    return (val.data?.therapist ?? []).map((e) => {
+      return {
+        ...e,
+        attendance: e.attendance
+          ? {
+              ...e.attendance,
+              checkIn: e.attendance.checkIn!
+                ? new Date(`${e.attendance.checkIn}`)
+                : undefined,
+              checkOut: e.attendance.checkOut!
+                ? new Date(`${e.attendance.checkOut}`)
+                : undefined,
+            }
+          : undefined,
+      };
+    });
   },
 });
 const reset = () => {
@@ -71,6 +86,22 @@ const deleteTherapist = (id: number) =>
   deleteS.call({
     url: `/server/cabangtherapist/${id}?cabang=${route.params.id}`,
     method: "delete",
+    title: "Therapist Cabang",
+    onSuccess: refresh,
+  });
+
+const checkIn = (id: number) =>
+  deleteS.call({
+    url: `/server/therapist/${id}/checkin?cabang=${route.params.id}`,
+    method: "post",
+    title: "Therapist Cabang",
+    onSuccess: refresh,
+  });
+
+const checkout = (id: number) =>
+  deleteS.call({
+    url: `/server/therapist/${id}/checkout?cabang=${route.params.id}`,
+    method: "post",
     title: "Therapist Cabang",
     onSuccess: refresh,
   });
@@ -135,7 +166,7 @@ const open = () => {
       class="grid"
       :style="{
         gridTemplateColumns: `repeat(${
-          (therapists ?? []).length === 0 ? '4' : '5'
+          (therapists ?? []).length === 0 ? '4' : '8'
         }, auto)`,
       }"
     >
@@ -146,6 +177,8 @@ const open = () => {
         <div>Name</div>
         <div>Gender</div>
         <div>Cabang</div>
+        <div v-if="(therapists ?? []).length !== 0">Check In</div>
+        <div v-if="(therapists ?? []).length !== 0">Check Out</div>
         <div v-if="(therapists ?? []).length !== 0">Action</div>
       </div>
       <div
@@ -173,6 +206,63 @@ const open = () => {
           <div>{{ titleCase(i.gender) }}</div>
           <div>
             {{ i.cabang?.nama }}
+          </div>
+          <div class="flex justify-center items-center">
+            <UButton
+              v-if="!i.attendance?.checkIn"
+              size="xs"
+              color="black"
+              class="text-black"
+              variant="outline"
+              @click="() => checkIn(i.id)"
+              label="Check In"
+            />
+
+            <div v-else class="flex flex-col items-center">
+              <p class="text-label_sm">
+                {{
+                  formatDateString("HH:mm:ss", i.attendance.checkIn.toString())
+                }}
+              </p>
+              <p>
+                {{
+                  formatDateString(
+                    "DD-MM-YYYY",
+                    i.attendance.checkIn.toString()
+                  )
+                }}
+              </p>
+            </div>
+          </div>
+
+          <div class="flex justify-center">
+            <div v-if="!i.attendance?.checkIn" size="sm" variant="secondary">
+              -
+            </div>
+            <UButton
+              v-else-if="!i.attendance?.checkOut"
+              label="Check Out"
+              size="xs"
+              color="black"
+              class="text-black"
+              @click="() => checkout(i.id)"
+              variant="outline"
+            />
+            <div v-else class="flex flex-col items-center">
+              <p class="text-label_sm">
+                {{
+                  formatDateString("HH:mm:ss", i.attendance.checkOut.toString())
+                }}
+              </p>
+              <p>
+                {{
+                  formatDateString(
+                    "DD-MM-YYYY",
+                    i.attendance.checkOut.toString()
+                  )
+                }}
+              </p>
+            </div>
           </div>
           <div>
             <EditDeleteButton :remove="() => deleteTherapist(i.id)" />
