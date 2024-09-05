@@ -2,14 +2,15 @@
 import EditDeleteButton from "~/components/EditDeleteButton.vue";
 import type { SResponse } from "~/lib/app";
 import type { VCategory, VTableColumn, VTags, VTreatment } from "~/lib/types";
-type Cur = number | undefined;
-const cursors = ref<Cur[]>([undefined]);
-const skip = ref("");
-const search = ref("");
 type TreatmentReq = SResponse<{
   treatment: VTreatment[];
   nextCursor: number | null;
 }>;
+
+type Cur = number | undefined;
+const cursors = ref<Cur[]>([undefined]);
+const skip = ref("");
+const search = ref("");
 const selectedTags = ref<VTags | undefined>();
 
 const selectedCategory = ref<VCategory | undefined>();
@@ -27,24 +28,23 @@ const { data, status, refresh } = await useApiFetch(
     },
   }
 );
-const loadingCategory = ref(false);
+
 const runtime = useRuntimeConfig().public.baseUrl;
-async function searchCategory(query: string) {
-  loadingCategory.value = true;
-  try {
-    const res: SResponse<{
+const categorySearch = useSearch();
+
+const searchCategory = async (query: string) =>
+  categorySearch.search<
+    {
       category: VCategory[];
-    }> = await $fetch(`/server/category?limit=6&query=${query}`, {
-      baseURL: runtime,
-      headers: app.bearer(),
-    });
-    loadingCategory.value = false;
-    return res.data?.category ?? <VCategory[]>[];
-  } catch (error) {
-    loadingCategory.value = false;
-    return <VCategory[]>[];
-  }
-}
+    },
+    VCategory[]
+  >(`/server/category?limit=6&query=${query}`, {
+    default: <VCategory[]>[],
+    transform: (val) => {
+      return val?.category ?? [];
+    },
+  });
+
 const loadingTag = ref(false);
 async function searchTag(query: string) {
   loadingTag.value = true;
@@ -150,7 +150,7 @@ const deleteForm = async (id: number) => {
         <UFormGroup label="Category">
           <USelectMenu
             placeholder="Search Category"
-            :loading="loadingCategory"
+            :loading="categorySearch.loading.value"
             :searchable="searchCategory"
             option-attribute="nama"
             by="id"

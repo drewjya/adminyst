@@ -127,8 +127,9 @@ const {
         </div>
       </div>
     </div>
-    <div class="grow h-full w-full flex flex-col gap-1">
+    <div class="grow h-full w-full flex flex-col gap-3 pb-20">
       <OrderList
+        :detail="true"
         :orders="orders?.order ?? []"
         :next-cursor="orders?.nextCursor ?? null"
         :status="statusOrders"

@@ -7,6 +7,7 @@ const {} = defineProps<{
   status: AsyncDataRequestStatus;
   orders: VOrder[];
   nextCursor: number | null;
+  detail?: boolean
 }>();
 </script>
 
@@ -15,7 +16,7 @@ const {} = defineProps<{
     <template #header>
       <div class="flex items-center justify-between">
         <h3 class="text-xl font-semibold">Orders</h3>
-        <NuxtLink
+        <NuxtLink v-if="detail"
           :to="`/cabang/${$route.params.id}/order`"
           class="p-2 py-0.5 hover:bg-gray-200 rounded underline"
         >
