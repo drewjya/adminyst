@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { OrderStatus } from "~/lib/enum";
-import type { State, VOrderDetail } from "~/lib/types";
+import type { State, VOrderDetail, VTherapist } from "~/lib/types";
 import {
   currencyFormat,
   formatDateString,
@@ -12,20 +12,69 @@ const { state } = defineProps<{
   state: State<VOrderDetail>;
 }>();
 
-const therapist = defineModel<number>();
-
 // const value = ref<OrderStatus | undefined>()
 
 const emit = defineEmits<{
   // <eventName>: <expected arguments>
-  select: [value: OrderStatus]; // named tuple syntax
+  select: [value: OrderStatus, therapistId: number]; // named tuple syntax
 }>();
 
-watchEffect(() => {
-  if (state.data) {
-    therapist.value = state.data.therapist?.id;
-  }
+const selectedTherapist = ref<VTherapist>();
+
+const app = useApp();
+
+const search = ref("");
+const searchNo = ref("");
+
+const url = computed(() => {
+  return `/server/therapist?query=${search.value ?? ""}&gender=${
+    state.data?.therapistGender ?? ""
+  }&no=${searchNo.value ?? ""}&cabang=${app.user?.cabang}&limit=6`;
 });
+
+const searchName = useSearch();
+
+const nameSearch = async (query: string) => {
+  search.value = query;
+  return searchName.search<
+    {
+      therapist: VTherapist[];
+    },
+    VTherapist[]
+  >(url.value, {
+    default: <VTherapist[]>[],
+    transform: (val) => {
+      return val?.therapist ?? [];
+    },
+  });
+};
+
+const noSearch = async (query: string) => {
+  searchNo.value = query;
+  return searchName.search<
+    {
+      therapist: VTherapist[];
+    },
+    VTherapist[]
+  >(url.value, {
+    default: <VTherapist[]>[],
+    transform: (val) => {
+      return val?.therapist ?? [];
+    },
+  });
+};
+const notif = useNotif();
+const onClick = (e: OrderStatus) => {
+  const therapistId = selectedTherapist.value?.id ?? state.data?.therapist?.id;
+  if (therapistId) {
+    emit("select", e, therapistId);
+    return;
+  }
+  notif.error({
+    title: "Something Wrong",
+    description: "Mohon Isi Therapist",
+  });
+};
 </script>
 
 <template>
@@ -52,7 +101,10 @@ watchEffect(() => {
             />
           </div>
           <USkeleton v-if="state.loading" class="w-64 h-4"></USkeleton>
-          <h3 v-else-if="state.data" class="text-label">
+          <h3
+            v-else-if="state.data"
+            class="text-label_lg bg-green-500 text-center text-white font-bold"
+          >
             {{
               formatDateString(
                 "DD MMM YYYY, HH:mm",
@@ -97,7 +149,7 @@ watchEffect(() => {
                 ).map((e) => {
                   return {
                     label: titleCase(e),
-                    click: () => emit('select', e),
+                    click: () => onClick(e),
                   };
                 }),
               ]"
@@ -145,15 +197,16 @@ watchEffect(() => {
       <div class="grid grid-cols-2 gap-4">
         <div class="grid gap-3">
           <div class="font-semibold">Therapist Information</div>
-          <div v-if="state.loading">
+          <div v-if="state.loading" class="flex flex-col gap-2">
             <USkeleton class="h-4 w-20"></USkeleton>
             <USkeleton class="h-4 w-20"></USkeleton>
           </div>
+
           <address
-            class="grid gap-0.5 not-italic text-muted-foreground"
             v-else-if="state.data"
+            class="grow w-full gap-0.5 not-italic text-muted-foreground"
           >
-            <span>
+            <div>
               {{
                 state.data.therapist
                   ? `${titleCase(titleCase(state.data.therapist.nama))} (${
@@ -161,10 +214,53 @@ watchEffect(() => {
                     })`
                   : "Random"
               }}
-            </span>
-            <span>{{ titleCase(state.data.therapistGender) }}</span>
+            </div>
+            <div>{{ titleCase(state.data.therapistGender) }}</div>
           </address>
         </div>
+      </div>
+      <UDivider class="my-4" />
+      <div class="grid grid-cols-1 gap-3 max-w-[40rem]">
+        <div class="flex justify-between items-center">
+          <div class="font-semibold">Change Or Chose Therapist</div>
+        </div>
+        <USelectMenu
+          v-model="selectedTherapist"
+          :loading="searchName.loading.value"
+          :searchable="nameSearch"
+          by="id"
+        >
+          <template #label>
+            {{
+              selectedTherapist
+                ? `${selectedTherapist.nama} (${selectedTherapist.no})`
+                : "Pilih Therapist"
+            }}
+          </template>
+
+          <template #option="{ option }">
+            <p>{{ (option as VTherapist).nama }}</p>
+          </template>
+        </USelectMenu>
+        <USelectMenu
+          class="w-full"
+          v-model="selectedTherapist"
+          :searchable="noSearch"
+          :loading="searchName.loading.value"
+          by="id"
+        >
+          <template #label>
+            {{
+              selectedTherapist
+                ? `${selectedTherapist.nama} (${selectedTherapist.no})`
+                : "Pilih Therapist"
+            }}
+          </template>
+
+          <template #option="{ option }">
+            <p>{{ (option as VTherapist).nama }}</p>
+          </template>
+        </USelectMenu>
       </div>
       <UDivider class="my-4" />
       <div class="grid gap-3">

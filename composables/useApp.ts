@@ -28,6 +28,13 @@ export const useApp = defineStore("global-app-store", () => {
         },
       });
       if (res.data) {
+        if (res.data.user.role === "ADMIN" || res.data.user.role === "USER") {
+          notif.error({
+            title: "Something Wrong",
+            description: "No Access ",
+          });
+          return;
+        }
         user.value = res.data?.user;
         accessToken.value = res.data.token.accessToken;
         refreshToken.value = res.data.token.refreshToken;
@@ -45,7 +52,7 @@ export const useApp = defineStore("global-app-store", () => {
         body: param,
       });
       if (res.data) {
-        if (res.data.user.role === "ADMIN") {
+        if (res.data.user.role === "ADMIN" || res.data.user.role === "USER") {
           notif.error({
             title: "Something Wrong",
             description: "No Access ",

@@ -13,7 +13,7 @@ export interface Token {
 export interface User {
   id: number;
   email: string;
-  role: "ADMIN" | "SUPERADMIN";
+  role: "ADMIN" | "SUPERADMIN"|"USER";
   cabang: number | null;
   name: string;
 }

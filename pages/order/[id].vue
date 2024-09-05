@@ -20,14 +20,14 @@ const { status, data, refresh } = await useApiFetch(`/server/order/${id}`, {
 const runtime = useRuntimeConfig();
 const loading = ref(false);
 const notif = useNotif();
-const updateStatus = async (status: OrderStatus) => {
+const updateStatus = async (status: OrderStatus, therapistId: number) => {
   loading.value = true;
   try {
     const res = await $fetch<SResponse<any>>(`/server/order/${id}/status`, {
       baseURL: runtime.public.baseUrl,
       method: "put",
       body: {
-        therapistId: therapist.value ?? data.value?.order?.therapist?.id,
+        therapistId: therapistId,
         status: status,
       },
       headers: app.bearer(),
