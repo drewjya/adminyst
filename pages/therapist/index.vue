@@ -257,12 +257,12 @@ const deleteForm = async (id: number) => {
           />
 
           <div v-else class="flex flex-col items-center">
-            <p class="font-semibold">
+            <p class="font-semibold text-label">
               {{
                 formatDateString("HH:mm:ss", data.attendance.checkIn.toString())
               }}
             </p>
-            <p class="text-label_sm">
+            <p class="text-label_xs">
               {{
                 formatDateString(
                   "DD-MM-YYYY",
@@ -280,13 +280,13 @@ const deleteForm = async (id: number) => {
           <UButton
             v-else-if="!data.attendance?.checkOut"
             label="Check Out"
-            size="xs"
+            size="2xs"
             color="black"
             class="text-black"
             variant="outline"
           />
           <div v-else class="flex flex-col items-center">
-            <p class="font-semibold">
+            <p class="font-semibold text-label">
               {{
                 formatDateString(
                   "HH:mm:ss",
@@ -294,7 +294,7 @@ const deleteForm = async (id: number) => {
                 )
               }}
             </p>
-            <p class="text-label_sm">
+            <p class="text-label_xs">
               {{
                 formatDateString(
                   "DD-MM-YYYY",

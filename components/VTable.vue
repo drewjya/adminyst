@@ -82,7 +82,7 @@ withDefaults(
       <div
         :key="getKey(curr)"
         v-for="(curr, index) in data"
-        class="col-span-full grid grid-cols-subgrid font-medium h-10 p-2"
+        class="col-span-full grid grid-cols-subgrid font-medium p-2"
         :class="index % 2 === 0 ? '' : 'bg-slate-200/50'"
       >
         <div
