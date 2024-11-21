@@ -174,3 +174,10 @@ export const hari: Record<number, String> = {
   6: "Sabtu",
   7: "Minggu",
 };
+
+
+export const stripZero = (val: string) => {
+  const value = val.split(':')
+  value.pop()
+  return value.join(':')
+}

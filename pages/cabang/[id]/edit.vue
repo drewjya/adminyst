@@ -2,7 +2,13 @@
 import dayjs from "dayjs";
 import { z } from "zod";
 import type { SResponse } from "~/lib/app";
-import type { FormSubmitEvent, Optional, VCabangDetail } from "~/lib/types";
+import {
+  listDay,
+  type FormSubmitEvent,
+  type Optional,
+  type VCabangDetail,
+} from "~/lib/types";
+import { stripZero } from "~/lib/utils";
 
 const MAX_FILE_SIZE = 5000000;
 
@@ -40,7 +46,7 @@ const schema = z.object({
 type Schema = z.output<typeof schema>;
 const state = reactive<Optional<Schema>>({
   alamat: "Jl something",
-  closeHour: "10:00:00",
+  closeHour: "10:00",
   happyHour: <
     {
       id: string;
@@ -54,12 +60,12 @@ const state = reactive<Optional<Schema>>({
       id: `init`,
       startDay: 1,
       endDay: 5,
-      startHour: "10:00:00",
-      endHour: "14:00:00",
+      startHour: "10:00",
+      endHour: "14:00",
     },
   ],
   name: "Test",
-  openHour: "22:00:00",
+  openHour: "22:00",
   phoneNumber: "628145081819",
   publicHoliday: false,
   file: undefined,
@@ -78,15 +84,15 @@ watch(data, (v) => {
   if (v) {
     state.name = v.nama;
     state.alamat = v.alamat;
-    state.closeHour = v.closeHour;
-    state.openHour = v.openHour;
+    state.closeHour = stripZero(v.closeHour);
+    state.openHour = stripZero(v.openHour);
     state.publicHoliday = v.happyHour?.publicHoliday;
     state.happyHour = v.happyHour?.happyHourDetail?.map((e) => {
       return {
         id: `${e.id}`,
         endDay: e.endDay,
-        endHour: e.endHour,
-        startHour: e.startHour,
+        endHour: stripZero(e.endHour),
+        startHour: stripZero(e.startHour),
         startDay: e.startDay,
       };
     });
@@ -100,8 +106,8 @@ const onSubmit = async (e: FormSubmitEvent<Schema>) => {
 
   formData.append("name", data.name);
   formData.append("phoneNumber", data.phoneNumber);
-  formData.append("openHour", data.openHour);
-  formData.append("closeHour", data.closeHour);
+  formData.append("openHour", data.openHour + ":00");
+  formData.append("closeHour", data.closeHour + ":00");
   formData.append("alamat", data.alamat);
   formData.append("publicHoliday", JSON.stringify(data.publicHoliday));
 
@@ -209,6 +215,9 @@ const erorr = ref();
               <USelectMenu
                 placeholder="Start"
                 v-model="state.happyHour[index]!.startDay"
+                :options="listDay"
+                value-attribute="id"
+                option-attribute="name"
               />
               <UInput type="time" v-model="state.happyHour[index]!.startHour" />
             </div>
@@ -226,6 +235,9 @@ const erorr = ref();
               <USelectMenu
                 placeholder="End"
                 v-model="state.happyHour[index]!.endDay"
+                :options="listDay"
+                value-attribute="id"
+                option-attribute="name"
               />
               <UInput type="time" v-model="state.happyHour[index]!.endHour" />
             </div>

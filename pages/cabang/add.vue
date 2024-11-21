@@ -2,7 +2,7 @@
 import dayjs from "dayjs";
 import { z } from "zod";
 import type { SResponse } from "~/lib/app";
-import type { FormSubmitEvent } from "~/lib/types";
+import { listDay, type FormSubmitEvent } from "~/lib/types";
 
 const MAX_FILE_SIZE = 5000000;
 const ACCEPTED_IMAGE_TYPES = [
@@ -39,7 +39,7 @@ type Schema = z.output<typeof schema>;
 
 const state = reactive<any>({
   alamat: "Jl something",
-  closeHour: "10:00:00",
+  closeHour: "10:00",
   happyHour: <
     {
       id: string;
@@ -53,12 +53,12 @@ const state = reactive<any>({
       id: `init`,
       startDay: 1,
       endDay: 5,
-      startHour: "10:00:00",
-      endHour: "14:00:00",
+      startHour: "10:00",
+      endHour: "14:00",
     },
   ],
   name: "Test",
-  openHour: "22:00:00",
+  openHour: "22:00",
   phoneNumber: "628145081819",
   publicHoliday: false,
   file: undefined,
@@ -73,8 +73,8 @@ const onSubmit = async (e: FormSubmitEvent<Schema>) => {
 
   formData.append("name", data.name);
   formData.append("phoneNumber", data.phoneNumber);
-  formData.append("openHour", data.openHour);
-  formData.append("closeHour", data.closeHour);
+  formData.append("openHour", data.openHour + ":00");
+  formData.append("closeHour", data.closeHour + ":00");
   formData.append("alamat", data.alamat);
   formData.append("publicHoliday", JSON.stringify(data.publicHoliday));
 
@@ -205,6 +205,9 @@ const erorr = ref();
               <USelectMenu
                 placeholder="Start"
                 v-model="state.happyHour[index].startDay"
+                :options="listDay"
+                value-attribute="id"
+                option-attribute="name"
               />
               <UInput type="time" v-model="state.happyHour[index].startHour" />
             </div>
@@ -221,7 +224,10 @@ const erorr = ref();
             <div class="flex flex-col gap-2">
               <USelectMenu
                 placeholder="End"
+                :options="listDay"
                 v-model="state.happyHour[index].endDay"
+                value-attribute="id"
+                option-attribute="name"
               />
               <UInput type="time" v-model="state.happyHour[index].endHour" />
             </div>
