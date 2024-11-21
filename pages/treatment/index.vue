@@ -136,39 +136,49 @@ const deleteForm = async (id: number) => {
   <div
     class="flex flex-col gap-2 w-[calc(100svw-2rem)] md:w-[calc(100svw-4rem)]"
   >
-    <div class="flex gap-2 items-end">
-      <div>
-        <ULink
-          variant="outline"
-          size="xs"
-          to="/treatment/add"
-          class="text-label_sm border p-2 rounded border-black font-semibold"
-          >Add New Treatment</ULink
-        >
-      </div>
-      <div class="max-w-[30rem]">
-        <UFormGroup label="Category">
-          <USelectMenu
-            placeholder="Search Category"
-            :loading="categorySearch.loading.value"
-            :searchable="searchCategory"
-            option-attribute="nama"
-            by="id"
-            v-model="selectedCategory"
-          />
-        </UFormGroup>
-      </div>
-      <div class="max-w-[30rem]">
-        <UFormGroup label="Tags">
-          <USelectMenu
-            placeholder="Search Tags"
-            :loading="loadingTag"
-            :searchable="searchTag"
-            option-attribute="name"
-            by="id"
-            v-model="selectedTags"
-          />
-        </UFormGroup>
+    <div class="flex items-center justify-end">
+      <ULink
+        to="/category"
+        class="text-label_sm p-2 py-1 rounded underline font-semibold hover:bg-gray-100"
+        >Category</ULink
+      >
+      <ULink
+        to="/tags"
+        class="text-label_sm p-2 py-1 rounded underline font-semibold hover:bg-gray-100"
+        >Tags</ULink
+      >
+      <ULink
+        to="/treatment/add"
+        class="text-label_sm p-2 py-1 rounded underline font-semibold hover:bg-gray-100"
+        >Add New Treatment</ULink
+      >
+    </div>
+    <div class="flex justify-between items-center">
+      <div class="flex gap-2 items-center">
+        <div class="max-w-[30rem]">
+          <UFormGroup label="Category">
+            <USelectMenu
+              placeholder="Search Category"
+              :loading="categorySearch.loading.value"
+              :searchable="searchCategory"
+              option-attribute="nama"
+              by="id"
+              v-model="selectedCategory"
+            />
+          </UFormGroup>
+        </div>
+        <div class="max-w-[30rem]">
+          <UFormGroup label="Tags">
+            <USelectMenu
+              placeholder="Search Tags"
+              :loading="loadingTag"
+              :searchable="searchTag"
+              option-attribute="name"
+              by="id"
+              v-model="selectedTags"
+            />
+          </UFormGroup>
+        </div>
       </div>
     </div>
     <VTable

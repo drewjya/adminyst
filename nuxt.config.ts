@@ -12,6 +12,12 @@ export default defineNuxtConfig({
     preference: "light",
   },
   css: ["~/assets/main.css"],
+  app: {
+    head: {
+      title: "Super Admin",
+    },
+  },
+
   modules: [
     "@nuxt/image",
     "@nuxt/ui",

@@ -29,7 +29,7 @@ const searchNo = ref("");
 const url = computed(() => {
   return `/server/therapist?query=${search.value ?? ""}&gender=${
     state.data?.therapistGender ?? ""
-  }&no=${searchNo.value ?? ""}&cabang=${app.user?.cabang}&limit=6`;
+  }&no=${searchNo.value ?? ""}&cabang=${app.user?.cabang ?? ""}&limit=6`;
 });
 
 const searchName = useSearch();
@@ -49,20 +49,18 @@ const nameSearch = async (query: string) => {
   });
 };
 
-const noSearch = async (query: string) => {
-  searchNo.value = query;
-  return searchName.search<
-    {
-      therapist: VTherapist[];
-    },
-    VTherapist[]
-  >(url.value, {
-    default: <VTherapist[]>[],
-    transform: (val) => {
-      return val?.therapist ?? [];
-    },
-  });
-};
+const date = ref();
+const time = ref();
+
+watchEffect(() => {
+  const val = state;
+  if (val.data?.therapist) {
+    nameSearch(val.data!.therapist.nama).then((v) => {
+      selectedTherapist.value = v.find((v) => v.id === val.data?.therapist?.id);
+    });
+  }
+});
+
 const notif = useNotif();
 const onClick = (e: OrderStatus) => {
   const therapistId = selectedTherapist.value?.id ?? state.data?.therapist?.id;
@@ -219,8 +217,12 @@ const onClick = (e: OrderStatus) => {
           </address>
         </div>
       </div>
-      <UDivider class="my-4" />
-      <div class="grid grid-cols-1 gap-3 max-w-[40rem]">
+
+      <UDivider class="my-4" v-if="state.data?.orderStatus === 'RESCHEDULE'" />
+      <div
+        class="grid grid-cols-1 gap-3 max-w-[40rem]"
+        v-if="state.data?.orderStatus === 'RESCHEDULE'"
+      >
         <div class="flex justify-between items-center">
           <div class="font-semibold">Change Or Chose Therapist</div>
         </div>
@@ -242,25 +244,27 @@ const onClick = (e: OrderStatus) => {
             <p>{{ (option as VTherapist).nama }}</p>
           </template>
         </USelectMenu>
-        <USelectMenu
-          class="w-full"
-          v-model="selectedTherapist"
-          :searchable="noSearch"
-          :loading="searchName.loading.value"
-          by="id"
-        >
-          <template #label>
-            {{
-              selectedTherapist
-                ? `${selectedTherapist.nama} (${selectedTherapist.no})`
-                : "Pilih Therapist"
-            }}
-          </template>
-
-          <template #option="{ option }">
-            <p>{{ (option as VTherapist).nama }}</p>
-          </template>
-        </USelectMenu>
+      </div>
+      <UDivider class="my-4" v-if="state.data?.orderStatus === 'RESCHEDULE'" />
+      <div
+        class="grid grid-cols-1 gap-3 max-w-[40rem]"
+        v-if="state.data?.orderStatus === 'RESCHEDULE'"
+      >
+        <div class="flex justify-between items-center">
+          <div class="font-semibold">Change Treatment Time</div>
+        </div>
+        <div class="flex gap-2">
+          <UInput
+            :disabled="state.data?.orderStatus !== 'RESCHEDULE'"
+            type="date"
+            v-model="date"
+          />
+          <UInput
+            :disabled="state.data?.orderStatus !== 'RESCHEDULE'"
+            type="time"
+            v-model="time"
+          />
+        </div>
       </div>
       <UDivider class="my-4" />
       <div class="grid gap-3">

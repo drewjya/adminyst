@@ -25,8 +25,6 @@ const email = ref("");
 const initDate = new Date();
 const phone = ref("");
 
-
-
 const resetDate = () => {
   return {
     start: new Date(
@@ -70,11 +68,25 @@ type OrderReq = SResponse<{
   order: VOrder[];
   nextCursor: number | null;
 }>;
-const { status, data, error } = await useApiFetch(() => url.value, {
+const { status, data, error, refresh } = await useApiFetch(() => url.value, {
   headers: app.bearer(),
   transform: (val: OrderReq) => {
     return val.data;
   },
+});
+
+let timer: NodeJS.Timeout | null = null;
+
+onMounted(() => {
+  timer = setInterval(() => {
+    refresh();
+  }, 60000);
+});
+
+onBeforeUnmount(() => {
+  if (timer) {
+    clearInterval(timer);
+  }
 });
 
 const { data: income } = await useApiFetch(
@@ -115,6 +127,19 @@ const watcher = watchIgnorable(
     });
   }
 );
+
+const onRefresh = () => {
+  console.log(timer);
+  if (timer) {
+    clearInterval(timer);
+  }
+  console.log(timer);
+
+  refresh();
+  timer = setInterval(() => {
+    refresh();
+  }, 60000);
+};
 
 onMounted(() => {
   const {
@@ -263,7 +288,19 @@ onMounted(() => {
 
           <UCard>
             <template #header>
-              <h3 class="text-xl font-semibold">Orders</h3>
+              <div class="flex justify-between items-center mr-4">
+                <h3 class="text-xl font-semibold">Orders</h3>
+                <UIcon
+                  v-if="status === 'pending'"
+                  name="i-eos-icons-arrow-rotate"
+                />
+                <UButton
+                  v-else
+                  icon="i-material-symbols-light-refresh"
+                  variant="ghost"
+                  @click="onRefresh"
+                />
+              </div>
             </template>
 
             <section

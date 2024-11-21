@@ -61,8 +61,8 @@ watch(selectCabang, (val) => {
     cabang: val?.id,
   };
 });
-watchEffect(() => {
-  const curr = data.value;
+
+watch(data, (curr) => {
   if (curr) {
     state.value.gender = curr.gender;
     state.value.name = curr.nama;
@@ -198,6 +198,7 @@ const labelTags = computed(() => {
       <UFormGroup label="Cabang" name="cabang">
         <div>
           <UInput v-model="state.cabang" type="hidden" />
+          <p>{{ selectCabang }}</p>
           <USelectMenu
             v-model="selectCabang"
             :loading
