@@ -198,7 +198,7 @@ const labelTags = computed(() => {
       <UFormGroup label="Cabang" name="cabang">
         <div>
           <UInput v-model="state.cabang" type="hidden" />
-          <p>{{ selectCabang }}</p>
+
           <USelectMenu
             v-model="selectCabang"
             :loading
