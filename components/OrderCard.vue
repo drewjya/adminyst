@@ -16,7 +16,7 @@ const { state } = defineProps<{
 
 const emit = defineEmits<{
   // <eventName>: <expected arguments>
-  select: [value: OrderStatus, therapistId: number]; // named tuple syntax
+  select: [value: OrderStatus, therapistId: number, orderDate: string, orderTime: string]; // named tuple syntax
 }>();
 
 const selectedTherapist = ref<VTherapist>();
@@ -32,7 +32,14 @@ const url = computed(() => {
   }&no=${searchNo.value ?? ""}&cabang=${app.user?.cabang ?? ""}&limit=6`;
 });
 
+const timeslotUrl = ({ date }: { date: string }) => {
+  return `/therapist/timeslot/${
+    state.data?.cabang.id ?? ""
+  }?date=${date}&therapistId=${selectedTherapist.value?.id ?? ""}`;
+};
+
 const searchName = useSearch();
+const timeslotReq = useTimeslot();
 
 const nameSearch = async (query: string) => {
   search.value = query;
@@ -49,15 +56,47 @@ const nameSearch = async (query: string) => {
   });
 };
 
+const timesotSearch = async () => {
+  return timeslotReq.request<
+    {
+      timeSlot: string[];
+    },
+    string[]
+  >(
+    timeslotUrl({
+      date: date.value,
+    }),
+    {
+      default: [],
+      transform: (val) => {
+        return val?.timeSlot ?? [];
+      },
+    }
+  );
+};
 const date = ref();
+
 const time = ref();
 
 watchEffect(() => {
   const val = state;
-  if (val.data?.therapist) {
-    nameSearch(val.data!.therapist.nama).then((v) => {
-      selectedTherapist.value = v.find((v) => v.id === val.data?.therapist?.id);
-    });
+  if (val.data) {
+    if (val.data.therapist) {
+      nameSearch(val.data!.therapist.nama).then((v) => {
+        selectedTherapist.value = v.find(
+          (v) => v.id === val.data?.therapist?.id
+        );
+      });
+    }
+
+    date.value = formatDateString(
+      "YYYY-MM-DD",
+      new Date(val.data.orderTime!).toString()
+    );
+    time.value = formatDateString(
+      "HH:mm:ss",
+      new Date(val.data.orderTime!).toString()
+    );
   }
 });
 
@@ -65,7 +104,7 @@ const notif = useNotif();
 const onClick = (e: OrderStatus) => {
   const therapistId = selectedTherapist.value?.id ?? state.data?.therapist?.id;
   if (therapistId) {
-    emit("select", e, therapistId);
+    emit("select", e, therapistId, date.value, time.value);
     return;
   }
   notif.error({
@@ -252,6 +291,7 @@ const onClick = (e: OrderStatus) => {
       >
         <div class="flex justify-between items-center">
           <div class="font-semibold">Change Treatment Time</div>
+          
         </div>
         <div class="flex gap-2">
           <UInput
@@ -259,9 +299,10 @@ const onClick = (e: OrderStatus) => {
             type="date"
             v-model="date"
           />
-          <UInput
+          <USelectMenu
             :disabled="state.data?.orderStatus !== 'RESCHEDULE'"
-            type="time"
+            :loading="timeslotReq.loading.value"
+            :searchable="timesotSearch"
             v-model="time"
           />
         </div>
