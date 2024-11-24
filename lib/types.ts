@@ -196,6 +196,10 @@ export type VCabangDetail = {
     id: number;
     path: string;
   };
+  vipRoom?: {
+    ninety_minute: number
+    one_twenty_minute: number
+  },
   happyHour?: {
     id: number;
     publicHoliday: boolean;

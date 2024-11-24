@@ -126,6 +126,16 @@ const {
           <p>{{ data.alamat }}</p>
         </div>
       </div>
+      <div class="border p-3 flex flex-col gap-1 rounded-xl">
+        <p class="font-semibold">VIP Room</p>
+        <p class="text-sm font-medium">
+          {{ data.vipRoom ? "Active" : "Non Active" }}
+        </p>
+        <div class="flex flex-col" v-if="data.vipRoom">
+          <div>90 Minute : {{ data.vipRoom.ninety_minute }}</div>
+          <div>90 Minute : {{ data.vipRoom.one_twenty_minute }}</div>
+        </div>
+      </div>
     </div>
     <div class="grow h-full w-full flex flex-col gap-3 pb-20">
       <OrderList

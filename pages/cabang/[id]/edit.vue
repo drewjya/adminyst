@@ -27,6 +27,12 @@ const schema = z.object({
   closeHour: z.string(),
   alamat: z.string(),
   publicHoliday: z.boolean(),
+  vip_room: z
+    .object({
+      ninety_minute: z.number(),
+      one_twenty_minute: z.number(),
+    })
+    .optional(),
   happyHour: z.array(
     z.object({
       id: z.string(),
@@ -80,6 +86,8 @@ const { data } = useApiFetch(`/server/cabang/${route.params.id}`, {
   },
 });
 
+const isVipRoom = ref(false);
+
 watch(data, (v) => {
   if (v) {
     state.name = v.nama;
@@ -96,6 +104,27 @@ watch(data, (v) => {
         startDay: e.startDay,
       };
     });
+
+    if (v.vipRoom) {
+      isVipRoom.value = true;
+      state.vip_room = {
+        ninety_minute: v.vipRoom.ninety_minute ?? 0,
+        one_twenty_minute: v.vipRoom.one_twenty_minute ?? 0,
+      };
+      console.log(state.vip_room);
+    }
+  }
+});
+
+watch(isVipRoom, (v) => {
+  if (v && !state.vip_room) {
+    state.vip_room = {
+      ninety_minute: 0,
+      one_twenty_minute: 0,
+    };
+  }
+  if (!v) {
+    state.vip_room = undefined;
   }
 });
 
@@ -119,6 +148,17 @@ const onSubmit = async (e: FormSubmitEvent<Schema>) => {
   });
 
   formData.append("file", data.file);
+
+  if (data.vip_room) {
+    formData.append(
+      `vip_room[ninety_minute]`,
+      `${data.vip_room.ninety_minute}`
+    );
+    formData.append(
+      `vip_room[one_twenty_minute]`,
+      `${data.vip_room.one_twenty_minute}`
+    );
+  }
 
   api.call({
     url: `/server/cabang/${route.params.id}`,
@@ -196,6 +236,17 @@ const erorr = ref();
     <UFormGroup label="Alamat" name="alamat">
       <UInput placeholder="Insert alamat" v-model="state.alamat" />
     </UFormGroup>
+    <!-- <UInput placeholder="Insert alamat" v-model="state.alamat" /> -->
+    <p class="text-label mt-2 font-semibold">VIP Room</p>
+    <UCheckbox label="Punya VIP Room" v-model="isVipRoom" />
+    <div class="flex gap-2" v-if="state.vip_room">
+      <UFormGroup label="90 Menit" name="vip_room.ninety_minute">
+        <UInput v-model.number="state.vip_room!.ninety_minute" />
+      </UFormGroup>
+      <UFormGroup label="120 Menit" name="vip_room.one_twenty_minute">
+        <UInput v-model.number="state.vip_room!.one_twenty_minute" />
+      </UFormGroup>
+    </div>
 
     <p class="text-label mt-2 font-semibold">Happy Hour</p>
     <div class="flex flex-col gap-2">
