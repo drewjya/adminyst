@@ -101,6 +101,15 @@ const deleteTreatment = (id: number) =>
 </script>
 
 <template>
+  <div class="flex justify-end">
+    <ULink
+      class="border rounded px-2 py-0.5 border-black text-label_sm"
+      size="sm"
+      variant="outline"
+      @click="$router.replace(`/cabang/${route.params.id}`)"
+      >Kembali</ULink
+    >
+  </div>
   <UCard>
     <template #header>
       <div class="flex items-center justify-between sticky top-0">

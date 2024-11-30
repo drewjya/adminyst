@@ -143,7 +143,16 @@ const labelTags = computed(() => {
   <div
     class="flex flex-col max-w-[42rem] w-full gap-5 font-medium justify-center"
   >
-    <h1 class="text-head_5 font-semibold">Add New Therapist</h1>
+    <div class="flex justify-between">
+      <h1 class="text-head_5 font-semibold">Add New Therapist</h1>
+      <ULink
+        class="border rounded px-2 py-0.5 border-black text-label_sm"
+        size="sm"
+        variant="outline"
+        @click="$router.replace('/therapist')"
+        >Kembali</ULink
+      >
+    </div>
     <UForm
       :state
       :schema

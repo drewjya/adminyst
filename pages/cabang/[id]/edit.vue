@@ -79,6 +79,7 @@ const state = reactive<Optional<Schema>>({
 const route = useRoute();
 const router = useRouter();
 const app = useApp();
+const runtime = useRuntimeConfig();
 const { data } = useApiFetch(`/server/cabang/${route.params.id}`, {
   headers: app.bearer(),
   transform: (data: SResponse<VCabangDetail>) => {
@@ -87,7 +88,7 @@ const { data } = useApiFetch(`/server/cabang/${route.params.id}`, {
 });
 
 const isVipRoom = ref(false);
-
+const fileData = ref();
 watch(data, (v) => {
   if (v) {
     state.name = v.nama;
@@ -113,8 +114,27 @@ watch(data, (v) => {
       };
       console.log(state.vip_room);
     }
+
+    if (v.picture) {
+      imageUrl.value = runtime.public.imageUrl + v.picture?.path;
+      // toDataUrl(imageUrl.value);
+    }
   }
 });
+
+const toDataUrl = (url: string) => {
+  return fetch(url).then(async (response) => {
+    const filenames = url.split(".");
+    const fileName =
+      filenames[filenames.length - 2] + filenames[filenames.length - 1];
+    const contentType = response.headers.get("content-type");
+    const blob = await response.blob();
+    const file = new File([blob], fileName, {
+      type: contentType ? contentType : undefined,
+    });
+    fileData.value = file;
+  });
+};
 
 watch(isVipRoom, (v) => {
   if (v && !state.vip_room) {
@@ -127,6 +147,8 @@ watch(isVipRoom, (v) => {
     state.vip_room = undefined;
   }
 });
+
+const imageUrl = ref();
 
 const loading = computed(() => api.loading.value);
 const onSubmit = async (e: FormSubmitEvent<Schema>) => {
@@ -202,12 +224,22 @@ const uploadImage = (e: FileList) => {
   if (e.length === 0) return;
 
   state.file = e[0];
-  // url.value = URL.createObjectURL(e[0]);
+  imageUrl.value = URL.createObjectURL(e[0]);
 };
 const erorr = ref();
 </script>
 
 <template>
+  <div class="flex justify-end">
+    <ULink
+      class="border rounded px-2 py-0.5 border-black text-label_sm"
+      size="sm"
+      variant="outline"
+      @click="$router.replace('/cabang')"
+      >Kembali</ULink
+    >
+  </div>
+
   <UForm
     class="max-w-[42rem] flex flex-col gap-2"
     :schema
@@ -313,6 +345,9 @@ const erorr = ref();
         color="black"
         label="Tambah Happy Hour"
       />
+    </div>
+    <div>
+      <img :src="imageUrl" v-if="imageUrl" class="h-96" />
     </div>
 
     <UFormGroup label="Gambar" name="file">

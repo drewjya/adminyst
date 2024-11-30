@@ -93,6 +93,15 @@ const removeImage = (index: number) => {
 </script>
 
 <template>
+  <div class="flex justify-end">
+    <ULink
+      class="border rounded px-2 py-0.5 border-black text-label_sm"
+      size="sm"
+      variant="outline"
+      @click="$router.replace('/')"
+      >Kembali</ULink
+    >
+  </div>
   <UCheckbox
     label="Multiple"
     help="Please check this box"

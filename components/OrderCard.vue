@@ -16,7 +16,12 @@ const { state } = defineProps<{
 
 const emit = defineEmits<{
   // <eventName>: <expected arguments>
-  select: [value: OrderStatus, therapistId: number, orderDate: string, orderTime: string]; // named tuple syntax
+  select: [
+    value: OrderStatus,
+    therapistId: number,
+    orderDate: string,
+    orderTime: string
+  ]; // named tuple syntax
 }>();
 
 const selectedTherapist = ref<VTherapist>();
@@ -155,7 +160,7 @@ const onClick = (e: OrderStatus) => {
             class="border rounded px-2 py-0.5 border-black text-label_sm"
             size="sm"
             variant="outline"
-            @click="$router.go(-1)"
+            @click="$router.replace('/order')"
             >Kembali</ULink
           >
         </div>
@@ -291,7 +296,6 @@ const onClick = (e: OrderStatus) => {
       >
         <div class="flex justify-between items-center">
           <div class="font-semibold">Change Treatment Time</div>
-          
         </div>
         <div class="flex gap-2">
           <UInput

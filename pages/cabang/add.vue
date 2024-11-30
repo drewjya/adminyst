@@ -187,6 +187,15 @@ const erorr = ref();
 </script>
 
 <template>
+  <div class="flex justify-end">
+    <ULink
+      class="border rounded px-2 py-0.5 border-black text-label_sm"
+      size="sm"
+      variant="outline"
+      @click="$router.replace('/cabang')"
+      >Kembali</ULink
+    >
+  </div>
   <UForm
     class="max-w-[42rem] flex flex-col gap-2"
     :schema

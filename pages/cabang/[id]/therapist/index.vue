@@ -130,6 +130,15 @@ const open = () => {
 
 <template>
   <div class="max-w-[42rem] flex flex-col gap-3">
+    <div class="flex justify-end">
+      <ULink
+        class="border rounded px-2 py-0.5 border-black text-label_sm"
+        size="sm"
+        variant="outline"
+        @click="$router.replace(`/cabang/${route.params.id}`)"
+        >Kembali</ULink
+      >
+    </div>
     <UFormGroup label="Search No">
       <UInput v-model="searchNo" placeholder="Search No" class="w-full" />
     </UFormGroup>

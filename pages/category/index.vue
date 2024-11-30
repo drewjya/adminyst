@@ -38,7 +38,16 @@ const editModal = (category: VCategory) => {
 <template>
   <div class="flex justify-between items-center">
     <p class="font-bold text-head_5">Category</p>
-    <UButton label="Add Category" size="xs" color="black" @click="addNew" />
+    <div class="flex justify-end gap-2">
+      <UButton label="Add Category" size="xs" color="black" @click="addNew" />
+      <ULink
+        class="border rounded px-2 py-0.5 border-black text-label_sm"
+        size="sm"
+        variant="outline"
+        @click="$router.replace('/treatment')"
+        >Kembali</ULink
+      >
+    </div>
   </div>
   <div class="grid grid-cols-5 space-x-1">
     <div

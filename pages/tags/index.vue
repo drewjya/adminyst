@@ -28,17 +28,24 @@ const addNew = () => {
   modal.open(ModalAddTag, {});
 };
 
-const editModal = (tag:VTags) => {
+const editModal = (tag: VTags) => {
   modal.open(ModalEditTag, {});
 };
-
-
 </script>
 
 <template>
   <div class="flex justify-between items-center">
     <p class="font-bold text-head_5">Tags</p>
-    <UButton label="Add Tags" size="xs" color="black" @click="addNew" />
+    <div class="flex justify-end gap-2">
+      <UButton label="Add Tags" size="xs" color="black" @click="addNew" />
+      <ULink
+        class="border rounded px-2 py-0.5 border-black text-label_sm"
+        size="sm"
+        variant="outline"
+        @click="$router.replace('/treatment')"
+        >Kembali</ULink
+      >
+    </div>
   </div>
   <div class="grid grid-cols-3 space-x-1">
     <div class="grid col-span-full grid-cols-subgrid bg-gray-200 p-2 rounded">
@@ -53,7 +60,9 @@ const editModal = (tag:VTags) => {
     >
       <div>{{ i.id }}</div>
       <div>{{ i.name }}</div>
-      <div><EditDeleteButton :remove="() => {}" :edit="() => editModal(i)" /></div>
+      <div>
+        <EditDeleteButton :remove="() => {}" :edit="() => editModal(i)" />
+      </div>
     </div>
   </div>
 </template>

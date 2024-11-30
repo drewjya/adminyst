@@ -96,7 +96,16 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
 
 <template>
   <div class="flex flex-col max-w-[42rem] w-full gap-5 font-medium">
-    <h1 class="text-head_5 font-semibold">Add New Admin</h1>
+    <div class="flex justify-between">
+      <h1 class="text-head_5 font-semibold">Add New Admin</h1>
+      <ULink
+        class="border rounded px-2 py-0.5 border-black text-label_sm"
+        size="sm"
+        variant="outline"
+        @click="$router.replace('/admin')"
+        >Kembali</ULink
+      >
+    </div>
     <UForm
       :state
       :schema
