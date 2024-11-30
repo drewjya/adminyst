@@ -177,11 +177,18 @@ const removeDetail = (id: string) => {
   }
 };
 
-const uploadImage = (e: FileList) => {
-  if (e.length === 0) return;
+const imageUrl = ref();
+const fileRef = ref<HTMLInputElement>();
+
+const uploadImage = (e: FileList | null) => {
+  if (!e || e.length === 0) return;
 
   state.file = e[0];
-  // url.value = URL.createObjectURL(e[0]);
+  imageUrl.value = URL.createObjectURL(e[0]);
+};
+
+const onClickFile = () => {
+  fileRef.value?.click();
 };
 const erorr = ref();
 </script>
@@ -303,7 +310,23 @@ const erorr = ref();
     </div>
 
     <UFormGroup label="Gambar" name="file">
-      <UInput type="file" @change="uploadImage" />
+      <button
+        class="h-fit min-h-72 max-h-96 w-full bg-gray-500/30 rounded-lg border-2 flex flex-col justify-center items-center m-auto p-4"
+        @click.prevent="onClickFile"
+        @dragover.prevent
+        @dragenter.prevent
+        @dragstart.prevent
+        @drop.prevent="uploadImage($event.dataTransfer?.files ?? null)"
+      >
+        <img :src="imageUrl" v-if="imageUrl" class="h-72" />
+        <div v-else>Click To Upload</div>
+      </button>
+      <input
+        type="file"
+        ref="fileRef"
+        class="hidden"
+        @change="uploadImage(($event.target as HTMLInputElement).files)"
+      />
     </UFormGroup>
     <p>{{ erorr }}</p>
 
