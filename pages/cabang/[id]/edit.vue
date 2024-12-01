@@ -89,7 +89,22 @@ const { data } = useApiFetch(`/server/cabang/${route.params.id}`, {
 
 const isVipRoom = ref(false);
 const fileData = ref();
-watch(data, (v) => {
+const imageUrl = ref();
+const toDataUrl = (url: string) => {
+  return fetch(url).then(async (response) => {
+    const filenames = url.split(".");
+    const fileName =
+      filenames[filenames.length - 2] + filenames[filenames.length - 1];
+    const contentType = response.headers.get("content-type");
+    const blob = await response.blob();
+    const file = new File([blob], fileName, {
+      type: contentType ? contentType : undefined,
+    });
+    state.file = file;
+  });
+};
+watchEffect(() => {
+  const v = data.value;
   if (v) {
     state.name = v.nama;
     state.alamat = v.alamat;
@@ -117,24 +132,10 @@ watch(data, (v) => {
 
     if (v.picture) {
       imageUrl.value = runtime.public.imageUrl + v.picture?.path;
-      // toDataUrl(imageUrl.value);
+      toDataUrl(imageUrl.value);
     }
   }
 });
-
-const toDataUrl = (url: string) => {
-  return fetch(url).then(async (response) => {
-    const filenames = url.split(".");
-    const fileName =
-      filenames[filenames.length - 2] + filenames[filenames.length - 1];
-    const contentType = response.headers.get("content-type");
-    const blob = await response.blob();
-    const file = new File([blob], fileName, {
-      type: contentType ? contentType : undefined,
-    });
-    fileData.value = file;
-  });
-};
 
 watch(isVipRoom, (v) => {
   if (v && !state.vip_room) {
@@ -147,8 +148,6 @@ watch(isVipRoom, (v) => {
     state.vip_room = undefined;
   }
 });
-
-const imageUrl = ref();
 
 const loading = computed(() => api.loading.value);
 const onSubmit = async (e: FormSubmitEvent<Schema>) => {
@@ -183,7 +182,7 @@ const onSubmit = async (e: FormSubmitEvent<Schema>) => {
   }
 
   api.call({
-    url: `/server/cabang/${route.params.id}`,
+    url: `/server/cabangassak/${route.params.id}`,
     method: "put",
     onSuccess: () => {
       router.go(-1);
